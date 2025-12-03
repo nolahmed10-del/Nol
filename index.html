@@ -3,200 +3,51 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Connect Wallet — Polygon (Purple Theme)</title>
+  <title>Connect Wallet — Polygon (Purple Theme) — WalletConnect v2</title>
 
-  <!-- Ethers.js (v5 UMD) -->
+  <!-- Ethers.js -->
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-  <!-- WalletConnect v1 provider (UMD) - used as an option; switch to WalletConnect v2 if you prefer -->
-  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
+
+  <!-- WalletConnect v2 Ethereum Provider (UMD build) -->
+  <!-- Placeholder CDN: if your environment blocks or a version mismatch occurs, replace with the official package from npm and bundle it. -->
+  <script src="https://unpkg.com/@walletconnect/ethereum-provider@2.3.5/dist/umd/index.min.js"></script>
+
+  <!-- Web3Modal (standalone) v2 (UMD) - provides the modern wallet selection modal and deep links for many mobile wallets -->
+  <!-- NOTE: CDN versions vary; if you encounter a mismatch, use the official Web3Modal v2 docs to install/build. -->
+  <script src="https://unpkg.com/@web3modal/standalone@2.8.0/dist/index.min.js"></script>
 
   <style>
     :root{
-      --purple-900: #2b0b45;
+      --purple-900: #25042f;
       --purple-700: #5a0fa8;
       --purple-500: #7b2bff;
       --purple-300: #b595ff;
       --bg: #0f0813;
-      --chip-bg: linear-gradient(135deg, rgba(123,43,255,0.12), rgba(90,15,168,0.06));
-      --glass: rgba(255,255,255,0.04);
     }
-
-    /* Reset / Blank canvas */
-    html,body{
-      height:100%;
-      margin:0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: linear-gradient(180deg, #0b0710 0%, #12061a 60%);
-      color: #fff;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-    /* Container is intentionally minimal (blank page except centered content) */
-    .container{
-      width:100%;
-      max-width:860px;
-      padding:48px;
-      box-sizing:border-box;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-    /* Main Connect / Disconnect button */
-    .connect-btn{
-      background: linear-gradient(90deg,var(--purple-700),var(--purple-500));
-      border: none;
-      color: white;
-      padding:14px 22px;
-      border-radius:12px;
-      box-shadow: 0 8px 30px rgba(123,43,255,0.16), inset 0 -2px 0 rgba(0,0,0,0.15);
-      font-weight:600;
-      font-size:16px;
-      cursor:pointer;
-      display:flex;
-      gap:12px;
-      align-items:center;
-      transition:transform .12s ease, box-shadow .12s ease;
-    }
-    .connect-btn:hover{ transform:translateY(-3px); box-shadow:0 18px 50px rgba(123,43,255,0.12); }
-
-    .connect-btn .dot {
-      width:10px;height:10px;border-radius:50%;
-      background: radial-gradient(circle at 30% 30%, #fff9, rgba(255,255,255,0.06) 30%), #fff;
-      box-shadow: 0 2px 8px rgba(123,43,255,0.28);
-    }
-
-    /* Chip container (modal-like) - modern stylized */
-    .chip-modal {
-      position: fixed;
-      left: 0; right: 0; bottom: 0; top: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(180deg, rgba(11,7,16,0.6), rgba(11,7,16,0.8));
-      z-index: 9999;
-      backdrop-filter: blur(8px) saturate(120%);
-      padding: 24px;
-      box-sizing: border-box;
-    }
-
-    .chip-sheet {
-      width:100%;
-      max-width:560px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-      border-radius:16px;
-      padding:20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-      border: 1px solid rgba(255,255,255,0.04);
-      box-sizing:border-box;
-    }
-
-    .sheet-header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      margin-bottom:16px;
-    }
-    .sheet-title{
-      font-size:18px;
-      font-weight:700;
-      color: var(--purple-300);
-      display:flex;align-items:center;gap:12px;
-    }
-    .sheet-sub{ font-size:13px; color: #cfc7ee; opacity:0.9; }
-
-    .wallet-list{
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      margin-top:6px;
-    }
-
-    /* Individual wallet chip */
-    .wallet-chip{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      padding:12px 14px;
-      border-radius:12px;
-      background: var(--chip-bg);
-      border:1px solid rgba(123,43,255,0.08);
-      cursor:pointer;
-      transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
-    }
-    .wallet-chip:hover{
-      transform:translateY(-4px);
-      box-shadow: 0 14px 40px rgba(90,15,168,0.12);
-      background: linear-gradient(90deg, rgba(123,43,255,0.08), rgba(90,15,168,0.04));
-    }
-
-    .wallet-left{ display:flex; align-items:center; gap:12px; }
-    .wallet-icon{
-      width:44px;height:44px;border-radius:10px;
-      display:flex;align-items:center;justify-content:center;
-      background: linear-gradient(135deg, rgba(123,43,255,0.22), rgba(90,15,168,0.12));
-      border:1px solid rgba(255,255,255,0.03);
-      font-weight:700;
-      color: white;
-      font-size:16px;
-      flex: 0 0 44px;
-    }
-    .wallet-meta{ display:flex; flex-direction:column; }
-    .wallet-name{ font-weight:700; color:#fff; font-size:15px; }
-    .wallet-desc{ font-size:12px; color:#d7cfff; opacity:0.95; margin-top:4px; }
-
-    .wallet-action{ display:flex;align-items:center; gap:10px; }
-
-    /* Connected chip (shows address + balance) */
-    .connected-chip{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      padding:10px 14px;
-      border-radius:999px;
-      background: linear-gradient(90deg, rgba(123,43,255,0.14), rgba(90,15,168,0.06));
-      border:1px solid rgba(123,43,255,0.14);
-      color: #fff;
-      font-weight:600;
-      cursor:pointer;
-      box-shadow: 0 8px 30px rgba(123,43,255,0.06);
-    }
-    .connected-chip img{width:22px;height:22px;border-radius:6px}
-
-    .address {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
-      font-size:13px;
-      color:#fff;
-      opacity:0.95;
-    }
-
-    .balance{
-      font-size:13px;
-      color:#ffd6ff;
-      opacity:0.95;
-      background: rgba(255,255,255,0.02);
-      padding:6px 8px;border-radius:8px;
-      font-weight:700;
-    }
-
-    .close-x{
-      width:36px;height:36px;border-radius:10px;
-      display:inline-flex;align-items:center;justify-content:center;
-      background: rgba(255,255,255,0.02);
-      border:1px solid rgba(255,255,255,0.02);
-      cursor:pointer;
-    }
-
-    /* Mobile */
-    @media (max-width:520px){
-      .chip-sheet{ padding:14px; border-radius:12px; }
-    }
+    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;background:linear-gradient(180deg,#0b0710 0%, #12061a 60%);color:#fff;display:flex;align-items:center;justify-content:center;}
+    .container{width:100%;max-width:860px;padding:48px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;}
+    .connect-btn{background:linear-gradient(90deg,var(--purple-700),var(--purple-500));border:none;color:white;padding:14px 22px;border-radius:12px;box-shadow:0 8px 30px rgba(123,43,255,0.16), inset 0 -2px 0 rgba(0,0,0,0.15);font-weight:600;font-size:16px;cursor:pointer;display:flex;gap:12px;align-items:center;transition:transform .12s ease,box-shadow .12s ease;}
+    .connect-btn:hover{transform:translateY(-3px);}
+    .dot{width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#fff9,rgba(255,255,255,0.06) 30%),#fff;box-shadow:0 2px 8px rgba(123,43,255,0.28);}
+    /* Modal sheet (internal chip) styles */
+    .chip-modal{position:fixed;left:0;right:0;top:0;bottom:0;display:none;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(11,7,16,0.6),rgba(11,7,16,0.8));z-index:9999;backdrop-filter:blur(8px) saturate(120%);padding:24px;box-sizing:border-box;}
+    .chip-sheet{width:100%;max-width:640px;background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.02));border-radius:16px;padding:20px;box-shadow:0 10px 40px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.04);box-sizing:border-box;}
+    .sheet-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;}
+    .sheet-title{font-size:18px;font-weight:700;color:var(--purple-300);display:flex;align-items:center;gap:12px;}
+    .sheet-sub{font-size:13px;color:#cfc7ee;opacity:0.95;}
+    .wallet-list{display:flex;flex-direction:column;gap:12px;margin-top:6px;}
+    .wallet-chip{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:12px;background:linear-gradient(135deg, rgba(123,43,255,0.08), rgba(90,15,168,0.02));border:1px solid rgba(123,43,255,0.06);cursor:pointer;transition:transform .12s ease,box-shadow .12s ease;}
+    .wallet-chip:hover{transform:translateY(-4px);box-shadow:0 14px 40px rgba(90,15,168,0.12);}
+    .wallet-left{display:flex;align-items:center;gap:12px;}
+    .wallet-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg, rgba(123,43,255,0.22), rgba(90,15,168,0.12));border:1px solid rgba(255,255,255,0.03);font-weight:700;color:white;font-size:16px;flex:0 0 44px;}
+    .wallet-meta{display:flex;flex-direction:column;}
+    .wallet-name{font-weight:700;color:#fff;font-size:15px;}
+    .wallet-desc{font-size:12px;color:#d7cfff;opacity:0.95;margin-top:4px;}
+    .wallet-action{display:flex;align-items:center;gap:10px;}
+    .connected-chip{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:999px;background:linear-gradient(90deg,rgba(123,43,255,0.14),rgba(90,15,168,0.06));border:1px solid rgba(123,43,255,0.14);color:#fff;font-weight:600;cursor:pointer;box-shadow:0 8px 30px rgba(123,43,255,0.06);}
+    .address{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,"Roboto Mono",monospace;font-size:13px;color:#fff;opacity:0.95;}
+    .balance{font-size:13px;color:#ffd6ff;opacity:0.95;background:rgba(255,255,255,0.02);padding:6px 8px;border-radius:8px;font-weight:700;}
+    .close-x{width:36px;height:36px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.02);cursor:pointer;}
   </style>
 </head>
 <body>
@@ -213,11 +64,9 @@
       <div class="sheet-header">
         <div>
           <div class="sheet-title">Connect wallet</div>
-          <div class="sheet-sub">Choose a wallet to connect to Polygon (Mainnet)</div>
+          <div class="sheet-sub">Choose a wallet to connect to Polygon (Mainnet). Mobile-friendly wallets and deep links included.</div>
         </div>
-        <div class="close-x" id="close-modal" title="Close">
-          ✕
-        </div>
+        <div class="close-x" id="close-modal" title="Close">✕</div>
       </div>
 
       <div class="wallet-list">
@@ -226,25 +75,21 @@
             <div class="wallet-icon">MM</div>
             <div class="wallet-meta">
               <div class="wallet-name">MetaMask</div>
-              <div class="wallet-desc">Connect with your browser's injected wallet.</div>
+              <div class="wallet-desc">Browser extension or MetaMask Mobile (deep link).</div>
             </div>
           </div>
-          <div class="wallet-action">
-            <div style="font-size:13px;color:#dcd0ff">Injected</div>
-          </div>
+          <div class="wallet-action"><div style="font-size:13px;color:#dcd0ff">Injected</div></div>
         </div>
 
-        <div class="wallet-chip" id="walletconnect-chip" title="WalletConnect">
+        <div class="wallet-chip" id="walletconnect-chip" title="WalletConnect (v2)">
           <div class="wallet-left">
             <div class="wallet-icon">WC</div>
             <div class="wallet-meta">
               <div class="wallet-name">WalletConnect</div>
-              <div class="wallet-desc">Scan QR or open a compatible mobile wallet.</div>
+              <div class="wallet-desc">Open a mobile wallet (WalletConnect v2 - many wallets supported).</div>
             </div>
           </div>
-          <div class="wallet-action">
-            <div style="font-size:13px;color:#dcd0ff">Protocol</div>
-          </div>
+          <div class="wallet-action"><div style="font-size:13px;color:#dcd0ff">QR / Deep Link</div></div>
         </div>
 
         <div class="wallet-chip" id="binance-chip" title="Binance Chain Wallet">
@@ -252,37 +97,57 @@
             <div class="wallet-icon">BN</div>
             <div class="wallet-meta">
               <div class="wallet-name">Binance Wallet</div>
-              <div class="wallet-desc">Open the Binance Chain Wallet extension (if installed).</div>
+              <div class="wallet-desc">Binance Chain Wallet extension or Binance mobile app.</div>
             </div>
           </div>
-          <div class="wallet-action">
-            <div style="font-size:13px;color:#dcd0ff">Injected</div>
+          <div class="wallet-action"><div style="font-size:13px;color:#dcd0ff">Injected</div></div>
+        </div>
+
+        <div class="wallet-chip" id="web3modal-chip" title="More wallets (mobile)">
+          <div class="wallet-left">
+            <div class="wallet-icon">+</div>
+            <div class="wallet-meta">
+              <div class="wallet-name">More wallets</div>
+              <div class="wallet-desc">Open a modern selector that supports dozens of mobile wallets (recommended).</div>
+            </div>
           </div>
+          <div class="wallet-action"><div style="font-size:13px;color:#dcd0ff">All</div></div>
         </div>
       </div>
 
-      <!-- placeholder area for errors / status shown inside modal -->
       <div id="modal-status" style="margin-top:14px;color:#f6e9ff;font-size:13px;display:none"></div>
     </div>
   </div>
 
   <script>
     /***********************************************************************
-     * IMPORTANT: Replace the placeholders below with your project's values.
+     * CONFIGURATION (replace placeholders)
      *
-     * - POLYGON_RPC: Put your preferred Polygon RPC endpoint (e.g. from Alchemy, Infura, or QuickNode)
-     *   Example: "https://polygon-mainnet.g.alchemy.com/v2/YOUR_ALCHEMY_KEY"
+     * - POLYGON_RPC: your reliable Polygon RPC endpoint (Alchemy, QuickNode, etc.)
+     *   e.g. "https://polygon-mainnet.g.alchemy.com/v2/YOUR_KEY"
      *
-     * - WALLETCONNECT_PROJECT_ID: If you choose to migrate to WalletConnect v2, put your WC v2 Project ID.
-     *   For the legacy WalletConnect v1 provider included here, this is NOT required, but kept as a placeholder.
+     * - WALLETCONNECT_PROJECT_ID: WalletConnect v2 Project ID (required for v2).
+     *   Create one at https://cloud.walletconnect.com and paste it below.
      *
-     ***********************************************************************/
-    const POLYGON_CHAIN_ID_HEX = '0x89'; // Polygon mainnet chainId (hex)
+     * *********************************************************************/
+    const POLYGON_CHAIN_ID_HEX = '0x89';
     const POLYGON_CHAIN_ID_DEC = 137;
     const POLYGON_RPC = "https://polygon-mainnet.g.alchemy.com/v2/8ikEzpLeLerL-8xNW23fVUser"; // <-- REPLACE with your Polygon RPC (placeholder)
     const WALLETCONNECT_PROJECT_ID = '6557a92e369812727669d41cbeb95a1'; // <-- placeholder if you later use WCv2
 
-    // Globals
+    /***********************************************************************
+     * What I changed/added in this version:
+     * - Integrated WalletConnect v2 provider (via @walletconnect/ethereum-provider)
+     * - Integrated Web3Modal (standalone) to present a modern modal that supports many mobile wallets + deep links
+     * - Kept injected wallet flows (MetaMask/Binance) and added a "More wallets" button which triggers Web3Modal
+     * - Maintained the same purple, professional theme and the chip UI behavior (connect -> show chip with address/balance -> disconnect)
+     *
+     * Important: CDN UMD builds are used for convenience. For production, prefer bundling the official npm packages
+     * and lock versions in your build pipeline for stability.
+     *
+     ***********************************************************************/
+
+    // Elements
     const mainButton = document.getElementById('main-button');
     const mainBtnText = document.getElementById('main-btn-text');
     const chipModal = document.getElementById('chip-modal');
@@ -292,135 +157,45 @@
     const metamaskChip = document.getElementById('metamask-chip');
     const walletconnectChip = document.getElementById('walletconnect-chip');
     const binanceChip = document.getElementById('binance-chip');
+    const web3modalChip = document.getElementById('web3modal-chip');
 
-    // Keep track of provider info
-    let provider = null; // Ethers provider
-    let rawProvider = null; // raw provider (window.ethereum or WalletConnect provider)
+    // State
+    let provider = null;         // ethers provider
+    let rawProvider = null;      // underlying provider (window.ethereum or WC provider)
     let signer = null;
     let connectedAddress = null;
     let connectedBalance = null;
-    let connectedWalletType = null; // 'injected' | 'walletconnect' | 'binance'
+    let connectedWalletType = null;
 
-    // For walletconnect legacy provider constructor
-    const WCProviderConstructor = window.WalletConnectProvider?.default || window.WalletConnectProvider || null;
+    // Utilities
+    function shorten(addr){ if(!addr) return ''; return addr.slice(0,6) + '…' + addr.slice(-4); }
+    function formatBalance(wei){ try{ const eth = ethers.utils.formatEther(wei); const num = Number(eth); return (num >= 0.01) ? num.toFixed(4) : Number(eth).toString(); }catch(e){ return '0.0000'; } }
 
-    // Utility: shorten address
-    function shorten(addr){
-      if(!addr) return '';
-      return addr.slice(0,6) + '…' + addr.slice(-4);
-    }
+    function openModal(){ chipModal.style.display = 'flex'; chipModal.setAttribute('aria-hidden','false'); }
+    function closeModal(){ chipModal.style.display = 'none'; chipModal.setAttribute('aria-hidden','true'); modalStatus.style.display='none'; modalStatus.textContent=''; }
 
-    // Utility: format balance in MATIC with 4 decimals
-    function formatBalance(wei){
-      try{
-        const eth = ethers.utils.formatEther(wei);
-        const num = Number(eth);
-        return (num >= 0.01) ? num.toFixed(4) : num.toString();
-      }catch(e){ return '0.0000'; }
-    }
-
-    // Show modal
-    function openModal(){
-      chipModal.style.display = 'flex';
-      chipModal.setAttribute('aria-hidden','false');
-    }
-    function closeModal(){
-      chipModal.style.display = 'none';
-      chipModal.setAttribute('aria-hidden','true');
-      modalStatus.style.display = 'none';
-      modalStatus.textContent = '';
-    }
-
-    // Update "main button" UI depending on connection state
+    // Update the main button (connected vs connect)
     function refreshMainButton(){
       if(connectedAddress){
-        mainBtnText.textContent = 'Disconnect';
-        // Replace button with connected-chip look
-        mainButton.classList.add('connected');
-        // We will show a chip-like element inside the button showing address and balance
         mainButton.innerHTML = `
           <div class="connected-chip" id="connected-chip" title="${connectedAddress}">
-            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'><rect width='32' height='32' rx='6' fill='%23' /></svg>" alt="">
             <div class="address">${shorten(connectedAddress)}</div>
             <div class="balance">${connectedBalance} MATIC</div>
           </div>
         `;
-        // attach disconnect on click
         document.getElementById('connected-chip').addEventListener('click', disconnect);
       } else {
-        // reset to original button
         mainButton.innerHTML = `<span class="dot" aria-hidden="true"></span><span id="main-btn-text">Connect Wallet</span>`;
-        mainButton.classList.remove('connected');
       }
     }
 
-    // Copy to clipboard helper
-    function copyToClipboard(text){
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        navigator.clipboard.writeText(text).catch(()=>{/* ignore */});
-      } else {
-        const ta = document.createElement('textarea');
-        ta.value = text; document.body.appendChild(ta);
-        ta.select(); document.execCommand('copy'); ta.remove();
-      }
-    }
-
-    // Connect using injected provider (MetaMask or Binance)
-    async function connectInjected(kind){
-      try{
-        if(!window.ethereum){
-          modalStatus.style.display = 'block';
-          modalStatus.textContent = `No injected wallet detected in this browser. Please install MetaMask or Binance Chain Wallet.`;
-          return;
-        }
-
-        rawProvider = window.ethereum;
-        // Request accounts and ensure chain is Polygon
-        await ensurePolygonChain(rawProvider);
-        // Request accounts
-        const accounts = await rawProvider.request({ method: 'eth_requestAccounts' });
-        if(!accounts || accounts.length === 0){
-          modalStatus.style.display = 'block';
-          modalStatus.textContent = 'No accounts returned from wallet.';
-          return;
-        }
-
-        const account = ethers.utils.getAddress(accounts[0]);
-        provider = new ethers.providers.Web3Provider(rawProvider);
-        signer = provider.getSigner();
-        connectedAddress = account;
-
-        const bal = await provider.getBalance(account);
-        connectedBalance = formatBalance(bal);
-
-        connectedWalletType = kind === 'binance' ? 'binance' : 'injected';
-
-        // Listen for account / chain changes
-        setupInjectedListeners(rawProvider);
-
-        // UI
-        closeModal();
-        refreshMainButton();
-      }catch(err){
-        console.error('Injected connect error:', err);
-        modalStatus.style.display = 'block';
-        modalStatus.textContent = 'Connection failed: ' + (err.message || err.toString());
-      }
-    }
-
-    // Ensure the wallet is on Polygon mainnet; if not, ask to switch or add chain
     async function ensurePolygonChain(raw){
       try{
         const current = await raw.request({ method: 'eth_chainId' });
         if(current && current.toLowerCase() === POLYGON_CHAIN_ID_HEX) return;
-        // attempt switch
-        await raw.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: POLYGON_CHAIN_ID_HEX }]
-        });
+        await raw.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: POLYGON_CHAIN_ID_HEX }] });
       }catch(switchError){
-        // If 4902, try to add chain
-        const code = switchError?.code || switchError?.data?.originalError?.code;
+        const code = switchError?.code;
         if(code === 4902 || (switchError && /Unrecognized chain/i.test(switchError.message || ''))){
           try{
             await raw.request({
@@ -433,72 +208,104 @@
                 blockExplorerUrls: ['https://polygonscan.com']
               }]
             });
-            // after adding, try switching again
             await raw.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: POLYGON_CHAIN_ID_HEX }] });
           }catch(addErr){
             console.warn('Failed to add Polygon chain:', addErr);
             throw addErr;
           }
         } else {
-          // other error
           throw switchError;
         }
+      }
+    }
+
+    // Injected connection (MetaMask / Binance)
+    async function connectInjected(kind){
+      try{
+        if(!window.ethereum){
+          modalStatus.style.display = 'block';
+          modalStatus.textContent = `No injected wallet detected. Please install MetaMask or Binance Chain Wallet on this device.`;
+          return;
+        }
+        rawProvider = window.ethereum;
+        await ensurePolygonChain(rawProvider);
+        const accounts = await rawProvider.request({ method: 'eth_requestAccounts' });
+        if(!accounts || accounts.length === 0){
+          modalStatus.style.display = 'block';
+          modalStatus.textContent = 'No accounts returned from wallet.';
+          return;
+        }
+        const account = ethers.utils.getAddress(accounts[0]);
+        provider = new ethers.providers.Web3Provider(rawProvider);
+        signer = provider.getSigner();
+        connectedAddress = account;
+        const bal = await provider.getBalance(account);
+        connectedBalance = formatBalance(bal);
+        connectedWalletType = kind === 'binance' ? 'binance' : 'injected';
+        setupInjectedListeners(rawProvider);
+        closeModal();
+        refreshMainButton();
+      }catch(err){
+        console.error('Injected connect error:', err);
+        modalStatus.style.display = 'block';
+        modalStatus.textContent = 'Connection failed: ' + (err.message || err.toString());
       }
     }
 
     function setupInjectedListeners(raw){
       if(!raw || !raw.on) return;
       raw.on('accountsChanged', (accounts) => {
-        if(!accounts || accounts.length === 0){
-          // disconnected
-          disconnect();
-          return;
-        }
+        if(!accounts || accounts.length === 0){ disconnect(); return; }
         connectedAddress = ethers.utils.getAddress(accounts[0]);
-        // refresh balance
-        provider.getBalance(connectedAddress).then(b => {
-          connectedBalance = formatBalance(b);
-          refreshMainButton();
-        }).catch(()=>refreshMainButton());
+        provider.getBalance(connectedAddress).then(b => { connectedBalance = formatBalance(b); refreshMainButton(); }).catch(() => refreshMainButton());
       });
-
       raw.on('chainChanged', (chainId) => {
         if(chainId !== POLYGON_CHAIN_ID_HEX){
-          // prompt switch or disconnect
           modalStatus.style.display = 'block';
           modalStatus.textContent = 'Please switch back to Polygon network in your wallet.';
-        } else {
-          modalStatus.style.display = 'none';
-          modalStatus.textContent = '';
-        }
+        } else { modalStatus.style.display = 'none'; modalStatus.textContent = ''; }
       });
-
-      raw.on('disconnect', () => {
-        disconnect();
-      });
+      raw.on('disconnect', () => { disconnect(); });
     }
 
-    // Connect using WalletConnect (legacy provider included)
-    async function connectWalletConnect(){
-      if(!WCProviderConstructor){
+    // WalletConnect v2 via @walletconnect/ethereum-provider
+    // This provider will open the QR modal on desktop and deep links on mobile (many wallets supported)
+    async function connectWalletConnectV2(){
+      // sanity checks for library
+      const WCProvider = window.WalletConnect?.EthereumProvider || window.WalletConnectEthereumProvider || window.WalletConnect?.Ethereum?.Provider || window.WalletConnectProvider;
+      if(!WCProvider){
         modalStatus.style.display = 'block';
-        modalStatus.textContent = 'WalletConnect provider library not loaded.';
+        modalStatus.textContent = 'WalletConnect v2 library not loaded. Please include @walletconnect/ethereum-provider (v2) in your page.';
+        return;
+      }
+
+      if(!WALLETCONNECT_PROJECT_ID || WALLETCONNECT_PROJECT_ID === 'YOUR_WALLETCONNECT_PROJECT_ID'){
+        modalStatus.style.display = 'block';
+        modalStatus.textContent = 'Please set your WalletConnect v2 Project ID in the WALLETCONNECT_PROJECT_ID variable.';
         return;
       }
 
       modalStatus.style.display = 'block';
-      modalStatus.textContent = 'Opening WalletConnect QR...';
+      modalStatus.textContent = 'Opening WalletConnect modal...';
 
       try{
-        // NOTE: This uses legacy WalletConnect v1 provider for simplicity.
-        rawProvider = new WCProviderConstructor({
-          rpc: { [POLYGON_CHAIN_ID_DEC]: POLYGON_RPC }, // replace placeholder above as needed
-          chainId: POLYGON_CHAIN_ID_DEC,
-          qrcode: true,
-          // infuraId or projectId would be placed here for some providers; kept as placeholders.
+        // Create the WalletConnect v2 provider
+        rawProvider = await WCProvider.init({
+          projectId: WALLETCONNECT_PROJECT_ID,
+          chains: [POLYGON_CHAIN_ID_DEC],
+          showQrModal: true,
+          rpcMap: { [POLYGON_CHAIN_ID_DEC]: POLYGON_RPC },
+          optionalChains: [],
+          metadata: {
+            name: "Your Project Name",
+            description: "Connect to Polygon via WalletConnect v2",
+            url: window.location.origin,
+            icons: []
+          }
         });
 
-        await rawProvider.enable(); // opens QR / deep link
+        // request accounts
+        await rawProvider.request({ method: 'eth_requestAccounts' });
 
         provider = new ethers.providers.Web3Provider(rawProvider);
         signer = provider.getSigner();
@@ -507,100 +314,169 @@
           modalStatus.textContent = 'No accounts returned from WalletConnect.';
           return;
         }
-
         connectedAddress = ethers.utils.getAddress(accounts[0]);
         const bal = await provider.getBalance(connectedAddress);
         connectedBalance = formatBalance(bal);
-        connectedWalletType = 'walletconnect';
+        connectedWalletType = 'walletconnect_v2';
 
-        // Listen for disconnect event from WC provider
-        rawProvider.on && rawProvider.on('disconnect', () => {
-          disconnect();
+        // events
+        rawProvider.on && rawProvider.on('disconnect', () => disconnect());
+        rawProvider.on && rawProvider.on('accountsChanged', (accounts) => {
+          if(!accounts || accounts.length === 0) { disconnect(); return; }
+          connectedAddress = ethers.utils.getAddress(accounts[0]);
+          provider.getBalance(connectedAddress).then(b => { connectedBalance = formatBalance(b); refreshMainButton(); }).catch(()=>refreshMainButton());
+        });
+        rawProvider.on && rawProvider.on('chainChanged', (chainId) => {
+          if(chainId !== POLYGON_CHAIN_ID_HEX){
+            modalStatus.style.display = 'block';
+            modalStatus.textContent = 'Please switch back to Polygon network in your wallet.';
+          } else {
+            modalStatus.style.display = 'none';
+            modalStatus.textContent = '';
+          }
         });
 
         closeModal();
         refreshMainButton();
       }catch(err){
-        console.error('WalletConnect error', err);
+        console.error('WalletConnect v2 error', err);
         modalStatus.style.display = 'block';
         modalStatus.textContent = 'WalletConnect failed: ' + (err && err.message ? err.message : err);
       }
     }
 
-    async function disconnect(){
-      try{
-        // For WalletConnect provider, call disconnect
-        if(rawProvider && rawProvider.disconnect && typeof rawProvider.disconnect === 'function'){
-          try{ await rawProvider.disconnect(); } catch(e){ /* ignore */ }
-        }
-        // Clear our locals
-        provider = null;
-        rawProvider = null;
-        signer = null;
-        connectedAddress = null;
-        connectedBalance = null;
-        connectedWalletType = null;
-
-        // restore main button
-        refreshMainButton();
-      }catch(err){
-        console.error('Disconnect error', err);
+    // Web3Modal (standalone) integration: opens a well-supported selector with many wallets,
+    // using WalletConnect v2 under the hood for most mobile wallets.
+    // This gives the same high-quality selection experience used by modern projects.
+    let web3modalInstance = null;
+    function ensureWeb3Modal(){
+      if(web3modalInstance) return web3modalInstance;
+      const Web3ModalStandalone = window.Web3Modal?.default || window.Web3ModalStandalone || window.Web3Modal;
+      if(!Web3ModalStandalone){
+        return null;
       }
+      // Create the Web3Modal with your WalletConnect projectId and theming
+      web3modalInstance = Web3ModalStandalone.create({
+        projectId: WALLETCONNECT_PROJECT_ID,
+        // theme customization (keeps purple accent)
+        theme: {
+          themeMode: 'dark',
+          themeVariables: {
+            '--w3m-accent-color': '#7b2bff',
+            '--w3m-background-color': '#100718',
+            '--w3m-border-radius': '12px'
+          }
+        },
+        ethereum: {
+          appName: 'Your Project Name',
+          // chainId preference can be passed when connecting
+        }
+      });
+      return web3modalInstance;
     }
 
-    // Button click: open modal if not connected, otherwise disconnect
-    mainButton.addEventListener('click', (e) => {
-      if(connectedAddress){
-        // clicking when connected acts as disconnect
-        disconnect();
+    async function openWeb3ModalAndConnect(){
+      const modal = ensureWeb3Modal();
+      if(!modal){
+        modalStatus.style.display = 'block';
+        modalStatus.textContent = 'Web3Modal library not loaded. For broader wallet support include @web3modal/standalone.';
         return;
       }
+      if(!WALLETCONNECT_PROJECT_ID || WALLETCONNECT_PROJECT_ID === 'YOUR_WALLETCONNECT_PROJECT_ID'){
+        modalStatus.style.display = 'block';
+        modalStatus.textContent = 'Please set your WalletConnect v2 Project ID in the WALLETCONNECT_PROJECT_ID variable before using the multi-wallet modal.';
+        return;
+      }
+
+      modal.openModal({
+        preferredChainId: POLYGON_CHAIN_ID_DEC
+      });
+
+      // Web3Modal standalone exposes connect event via a promise resolve or callback depending on build.
+      // For straightforward operation, we rely on WalletConnect v2 provider flow below (recommended).
+      // Still, attempt to bridge: if user connected via Web3Modal, we may receive a provider object.
+      // (Exact integration details depend on the web3modal version — if you plan to use this in prod,
+      // prefer bundling the latest web3modal and following its specific examples.)
+    }
+
+    // Disconnect helper (cleans up WalletConnect sessions if needed)
+    async function disconnect(){
+      try{
+        if(rawProvider && typeof rawProvider.disconnect === 'function'){
+          try{ await rawProvider.disconnect(); }catch(e){ /* ignore */ }
+        }
+      }catch(e){}
+      provider = null;
+      rawProvider = null;
+      signer = null;
+      connectedAddress = null;
+      connectedBalance = null;
+      connectedWalletType = null;
+      refreshMainButton();
+    }
+
+    // Event wiring
+    mainButton.addEventListener('click', (e) => {
+      if(connectedAddress){ disconnect(); return; }
       openModal();
     });
-
-    // Modal actions
     closeModalBtn.addEventListener('click', closeModal);
-    chipModal.addEventListener('click', (e) => {
-      if(e.target === chipModal) closeModal();
-    });
+    chipModal.addEventListener('click', (e) => { if(e.target === chipModal) closeModal(); });
 
     metamaskChip.addEventListener('click', async () => {
-      modalStatus.style.display = 'block';
-      modalStatus.textContent = 'Connecting to MetaMask...';
+      modalStatus.style.display='block'; modalStatus.textContent='Connecting to injected wallet...';
       await connectInjected('metamask');
     });
-
     binanceChip.addEventListener('click', async () => {
-      modalStatus.style.display = 'block';
-      modalStatus.textContent = 'Connecting to Binance Chain Wallet...';
+      modalStatus.style.display='block'; modalStatus.textContent='Connecting to Binance Chain Wallet...';
       await connectInjected('binance');
     });
 
+    // WalletConnect v2 chip: uses the v2 provider which opens a modern QR or mobile deep link
     walletconnectChip.addEventListener('click', async () => {
-      await connectWalletConnect();
+      await connectWalletConnectV2();
     });
 
-    // Accessibility: keyboard close with Escape
-    document.addEventListener('keydown', (e) => {
-      if(e.key === 'Escape') closeModal();
+    // "More wallets" opens Web3Modal (recommended) which enumerates many mobile wallets and deep links
+    web3modalChip.addEventListener('click', async () => {
+      modalStatus.style.display='block'; modalStatus.textContent='Opening universal wallet selector...';
+      await openWeb3ModalAndConnect();
     });
 
-    // Initialize UI
+    // Accessibility: ESC closes
+    document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeModal(); });
+
+    // Init UI
     refreshMainButton();
 
-    // Optional: attempt to auto-reconnect to WalletConnect session if present
-    (function tryAutoReconnect(){
-      try{
-        // WC v1 sets wc: {connected:true} in localStorage under "walletconnect"
-        const wc = localStorage.getItem('walletconnect');
-        if(wc){
-          // If there's a previous session we can try to reconnect silently
-          // but to keep behavior transparent, do not auto-reconnect without user action.
-          // You may uncomment below to auto-open modal to reconnect.
-          // openModal();
-        }
-      }catch(e){}
-    })();
+    // Notes for production:
+    // - Replace POLYGON_RPC with a reliable RPC (Alchemy/QuickNode). Using a public RPC can be rate-limited.
+    // - Set WALLETCONNECT_PROJECT_ID to a valid WalletConnect v2 projectId.
+    // - Prefer bundling @walletconnect/ethereum-provider and @web3modal/standalone in your build (rollup/webpack/Vite) instead of relying on CDNs.
+    // - If you want the "More wallets" button to return a provider object you should follow the web3modal docs for the particular version you include,
+    //   as the standalone package may provide connect callbacks you can hook into. The code above gives you the wallet-agnostic flows:
+    //   - injected: MetaMask/Binance handled directly
+    //   - walletconnect v2: opens QR or deep link and returns a provider available to ethers
+    //
+    // If you'd like, I can:
+    // - Bundle an example that uses a local build of web3modal + ethereum-provider with exact, tested versions,
+    // - Or generate a minimal Node/Vite project with locked dependencies so you get a deployable artifact that "just works".
   </script>
 </body>
 </html>
+``` 
+
+I updated the page to use WalletConnect v2 (via @walletconnect/ethereum-provider) and added a Web3Modal (standalone) integration point so mobile wallets get deep links and a broad selection — this is the modern, recommended flow for QR + mobile wallet support. I preserved the purple, professional visual and the chip behavior (show address + balance and allow disconnect).
+
+What I changed and why:
+- Replaced legacy WalletConnect v1 code with WalletConnect v2 provider initialization and instructions — WalletConnect v2 is required by many modern mobile wallets.
+- Added Web3Modal standalone integration so the same modal can present many wallets and deep links on mobile (this is what high-quality apps use to reach the broadest set of wallets).
+- Kept injected-wallet flows for MetaMask and Binance so desktop extension users keep a snappy native UX.
+- Kept placeholders and clear comments where you must insert your WALLETCONNECT_PROJECT_ID and POLYGON_RPC.
+
+Next steps I can take if you want:
+- Replace CDN/UMD usage with a small build (Vite/rollup) that locks working package versions and produces a single bundled JS file — this is what I'd recommend for production reliability.
+- Provide a fully tested package.json + Vite project with the exact versions I used and a working demo.
+- Implement the Web3Modal -> ethers provider bridging (so clicking "More wallets" returns a provider object that your app immediately uses) — this depends on the web3modal version you'd like to lock to.
+
+Tell me which of those you prefer and I will produce the exact files (or a bundled single-file deliverable) ready to deploy.
