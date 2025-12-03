@@ -565,43 +565,59 @@ async function connectInjected(){
     throw err;
   }
 }
-
-/* ====== WALLETCONNECT QR (fallback implementation) ======
-   This uses the WalletConnect v1 provider UMD (simpler fallback) when Web3Modal standalone isn't available.
-   It opens a QR code for desktop/mobile wallet scanning.
-*/
+<!-- Replace your existing connectWalletConnectQR function with this updated version -->
+<script>
 async function connectWalletConnectQR(){
   try {
-    // Try to use an already loaded provider if present
-    const WCPGlobal = window.WalletConnectProvider || (window.WalletConnectProvider && window.WalletConnectProvider.default) || null;
-    if(!WCPGlobal){
-      // load UMD from jsdelivr
+    // Ensure the UMD bundle is loaded (id avoids double-loading)
+    if(!window.WalletConnectProvider && !window.WalletConnectProvider?.default){
       await loadScript('https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js', 'walletconnect-provider');
     }
-    const WalletConnectProvider = window.WalletConnectProvider || window.WalletConnectProvider?.default;
-    if(!WalletConnectProvider) throw new Error('WalletConnect provider failed to load.');
 
-    // instantiate provider with RPC mapping so WalletConnect can connect to Polygon
-    const wcProvider = new WalletConnectProvider({
+    // Defensive: try several possible global shapes the UMD may expose
+    let WCPGlobal = window.WalletConnectProvider;
+    if(!WCPGlobal && window.WalletConnectProvider?.default) WCPGlobal = window.WalletConnectProvider.default;
+    if(!WCPGlobal && window.default && window.default.WalletConnectProvider) WCPGlobal = window.default.WalletConnectProvider;
+
+    if(!WCPGlobal){
+      // Give a clear, actionable error
+      console.error('WalletConnect UMD not found on window. Available keys:', Object.keys(window).filter(k=>/walletconnect/i.test(k)));
+      throw new Error('WalletConnect provider failed to load — check network or CSP.');
+    }
+
+    // If the global object is an object with a "default" that is the constructor, unwrap it
+    const ProviderCtor = (typeof WCPGlobal === 'function') ? WCPGlobal : (WCPGlobal.default || WCPGlobal);
+
+    if(typeof ProviderCtor !== 'function'){
+      console.error('Detected WalletConnect global but could not find constructor. window.WalletConnectProvider:', window.WalletConnectProvider);
+      throw new Error('WalletConnect provider is not a constructor (unexpected global export). Open console and inspect window.WalletConnectProvider.');
+    }
+
+    // Instantiate using the ctor we found
+    const wcProvider = new ProviderCtor({
       rpc: { 137: RPC_URL },
       chainId: CHAIN_ID,
       qrcode: true
     });
 
-    await wcProvider.enable(); // opens QR
-    // wrap with ethers
+    // This will open the QR code flow
+    await wcProvider.enable();
+
+    // Wrap with ethers
     ethersProvider = new ethers.providers.Web3Provider(wcProvider, 'any');
     signer = ethersProvider.getSigner();
     userAddress = await signer.getAddress();
     currentProvider = wcProvider;
     connectorType = 'walletconnect';
     saveState({ type: connectorType, ts: Date.now(), address: userAddress });
-    // handlers
+
+    // attach handlers
     if(wcProvider.on){
       wcProvider.on('disconnect', handleDisconnect);
       wcProvider.on('accountsChanged', handleAccountsChanged);
       wcProvider.on('chainChanged', handleChainChanged);
     }
+
     setConnectedUI(userAddress);
     showToast('Connected via WalletConnect: ' + shortAddr(userAddress));
     return true;
@@ -611,6 +627,7 @@ async function connectWalletConnectQR(){
     throw err;
   }
 }
+</script>
 
 /* ====== WEB3MODAL attempt (best-effort) ====== */
 async function connectWalletConnectModal(){
