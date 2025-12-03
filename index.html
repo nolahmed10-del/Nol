@@ -30,7 +30,7 @@ body{
 }
 
 /* NEBULA + PARTICLES */
-body::before{content:'';position:fixed;left:-50%;top:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(150,0,255,0.12),transparent 60%);animation:nebulaMove 35s infinite alternate ease-in-out;z-index:0}
+body::before{content:'';position:fixed;left:-50%;top:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(150,0,255,0.12),transparent 60%);animation:nebulaMove 35s infinite alternate ease-in-out}
 @keyframes nebulaMove{0%{transform:translate(-10%,-10%)}100%{transform:translate(5%,5%)}}
 .particle{position:absolute;width:4px;height:3px;background:#b445ff;border-radius:50%;opacity:0.8;animation:floatParticle linear infinite;z-index:-1}
 @keyframes floatParticle{0%{transform:translateY(0) translateX(0);opacity:0.8}50%{transform:translateY(-50px) translateX(20px);opacity:0.4}100%{transform:translateY(0) translateX(0);opacity:0.8}}
@@ -62,11 +62,11 @@ body::before{content:'';position:fixed;left:-50%;top:-50%;width:200%;height:200%
 }
 
 /* CARD */
-.container{width:90%;max-width:var(--container-max);margin:9px;background:var(--glass);border:1px solid rgba(255,255,255,0.08);border-radius:25px;padding:22px;backdrop-filter:blur(18px);box-shadow:var(--shadow);position:relative;z-index:5;}
+.container{width:90%;max-width:var(--container-max);margin:9px;background:var(--glass);border:1px solid rgba(255,255,255,0.08);border-radius:25px;padding:22px;backdrop-filter:blur(18px);box-shadow:0 10px 40px rgba(0,0,0,0.4)}
 
 /* connected chip sliding animation */
 .addr-chip {
-  padding:8px 12px;border-radius:12px;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));font-weight:700;color:#fff;display:none;align-items:center;gap:10px;box-shadow:0 8px 28px rgba(110,0,255,0.18);
+  padding:8px 12px;border-radius:12px;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));font-weight:700;color:#fff;display:none;align-items:center;gap:10px;box-shadow:0 8px 28px rgba(1,0,0,0.08);
   transition:transform 320ms cubic-bezier(.2,.9,.2,1),opacity 240ms ease,right 240ms ease;
 }
 .addr-chip.show{display:inline-flex;opacity:1;transform:translateY(0)}
@@ -77,13 +77,13 @@ body::before{content:'';position:fixed;left:-50%;top:-50%;width:200%;height:200%
 @keyframes ping{0%{box-shadow:0 0 0 0 rgba(32,201,151,0.14)}70%{box-shadow:0 0 0 10px rgba(32,201,151,0)}100%{box-shadow:0 0 0 0 rgba(32,201,151,0)}}
 
 /* UNIFIED ROW - compact "thin bar" look */
-.input-box{margin-top:14px;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:10px;position:relative;box-shadow:0 6px 18px rgba(0,0,0,0.35)}
+.input-box{margin-top:14px;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:10px;position:relative;box-shadow:inset 0 -2px 6px rgba(0,0,0,0.2)}
 .input-box .left{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
 
 /* chosen tokens: professional rounded-rectangle icons (not circular) */
 .token-icon{width:36px;height:36px;border-radius:8px;background:transparent;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;position:relative;border:1px solid rgba(255,255,255,0.04)}
 .token-icon img{width:100%;height:100%;object-fit:cover;display:block;border-radius:8px;z-index:6}
-.token-chip{position:absolute;right:-8px;bottom:-8px;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));padding:3px 7px;border-radius:999px;font-weight:800;font-size:10px;color:#fff;box-shadow:0 4px 14px rgba(180,0,255,0.12)}
+.token-chip{position:absolute;right:-8px;bottom:-8px;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));padding:3px 7px;border-radius:999px;font-weight:800;font-size:10px;color:#fff;box-shadow:0 6px 18px rgba(180,68,255,0.14)}
 
 /* SUGGESTIONS container (internal scroll only) */
 .suggestions{position:absolute;top:68px;left:12px;right:12px;background:var(--suggest-bg);border-radius:12px;padding:6px;max-height:240px;overflow:auto;display:none;z-index:220;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
@@ -110,7 +110,7 @@ body::before{content:'';position:fixed;left:-50%;top:-50%;width:200%;height:200%
 /* SWAP CONTROLS */
 .controls{margin-top:14px;display:flex;align-items:center;gap:12px;justify-content:space-between}
 .swap-outside{
-  width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);cursor:pointer
+  width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04)
 }
 .swap-outside:active{transform:translateY(1px);box-shadow:none}
 
@@ -153,7 +153,7 @@ body::before{content:'';position:fixed;left:-50%;top:-50%;width:200%;height:200%
 
 /* TOP-RIGHT CONNECT */
 .top-right-connect{position:fixed;right:18px;top:18px;z-index:70;display:flex;gap:10px;align-items:center}
-.connect-floating{background:linear-gradient(90deg,var(--glass-btn-bg),var(--glass-btn-bg));color:#fff;padding:10px 14px;border-radius:12px;border:1px solid var(--glass-btn-border);cursor:pointer;font-weight:900;display:inline-flex;align-items:center;gap:8px}
+.connect-floating{background:linear-gradient(90deg,var(--glass-btn-bg),var(--glass-btn-bg));color:#fff;padding:10px 14px;border-radius:12px;border:1px solid var(--glass-btn-border);cursor:pointer;font-weight:800}
 .connect-floating:hover{transform:scale(1.03);box-shadow:0 12px 30px rgba(100,20,120,0.12)}
 
 /* connected disconnect button */
@@ -373,31 +373,27 @@ button:focus-visible,
 <div class="chat-toggle" id="chatToggle">Public Chat🔘</div>
 
 <!-- CHAT PANEL -->
-<div class="chat-sidebar" id="chatSidebar">
-
+<div class="chat-sidebar" id="chatSidebar" style="display:none;position:fixed;right:18px;bottom:18px;width:360px;max-width:90%;background:var(--glass);border-radius:12px;padding:12px;z-index:999;backdrop-filter:blur(8px)">
   <h3 style="text-align:center;margin-bottom:10px;">Chat</h3>
-
-  <div id="chatMessages" style="overflow-y:auto; flex:1;"></div>
-
-  <div class="chat-input">
-    <input id="chatInput" placeholder="Drop your alpha...">
-    <button id="sendChat">NOLA</button>
+  <div id="chatMessages" style="overflow-y:auto; flex:1; max-height:320px;"></div>
+  <div class="chat-input" style="display:flex;gap:8px;margin-top:10px">
+    <input id="chatInput" placeholder="Drop your alpha..." style="flex:1;padding:8px;border-radius:8px;border:none;background:rgba(255,255,255,0.02);color:#fff">
+    <button id="sendChat" class="glassy-btn">NOLA</button>
   </div>
-
 </div>
 
 <!-- USERNAME POPUP -->
-<div id="usernameModal">
-  <div class="modal-content">
+<div id="usernameModal" style="display:none;position:fixed;left:0;top:0;right:0;bottom:0;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:1000">
+  <div class="modal-content" style="background:var(--glass);padding:18px;border-radius:12px;max-width:320px;margin:auto">
     <h3>Choose a Username</h3>
-    <input id="modalUsername" placeholder="Enter name">
-    <button id="confirmUsername">Say NOLA</button>
+    <input id="modalUsername" placeholder="Enter name" style="width:100%;padding:8px;border-radius:8px;border:none;background:rgba(255,255,255,0.02);color:#fff;margin-top:8px">
+    <button id="confirmUsername" class="glassy-btn" style="margin-top:10px">Say NOLA</button>
   </div>
 </div>
 <!-- footer -->
-<div class="footer">
+<div class="footer" style="position:fixed;left:18px;bottom:18px;color:rgba(255,255,255,0.6);font-size:13px">
   <div>© 2025 NOLA — All rights reserved</div>
-  <div><a href="terms&privacy.html" id="privacyTerms">Terms&Privacy</a> • <a href="https://x.com/NOLA_CHAIN" id="xLink">X</a> <a href="https:https://t.me/NOLA_community" id="tgLink">Telegram</a></div>
+  <div><a href="terms&privacy.html" id="privacyTerms" style="color:rgba(255,255,255,0.6)">Terms&Privacy</a> • <a href="https://x.com/NOLA_CHAIN" id="xLink" style="color:rgba(255,255,255,0.6)">X</a> <a href="https://t.me/NOLA_community" id="tgLink" style="color:rgba(255,255,255,0.6);margin-left:6px">Telegram</a></div>
 </div>
 
 <!-- LIBS -->
@@ -410,7 +406,7 @@ button:focus-visible,
 const RPC_URL = "https://polygon-mainnet.g.alchemy.com/v2/8ikEzpLeLerL-8xNW23fVUser";
 const CHAIN_ID = 137;
 const CHAIN_ID_HEX = '0x89';
-const WALLETCONNECT_PROJECT_ID = '6557a92e369812727669d41cbeb95a1';
+const WALLETCONNECT_PROJECT_ID = '6557a92e369812727669d41cbeb95a1'; // kept for Web3Modal attempts
 
 /* ====== ELEMENTS ====== */
 const connectFloating = document.getElementById('connectFloating');
@@ -448,7 +444,7 @@ function _processToastQueue(){
   setTimeout(()=> {
     el.style.transition = 'opacity 220ms'; el.style.opacity = '0';
     setTimeout(()=>{ el.remove(); _processToastQueue(); }, 260);
-  }, item.opts.ttl);
+  }, Math.max(1500, item.opts.ttl));
 }
 
 /* ====== HELPERS ====== */
@@ -464,7 +460,6 @@ function setConnectedUI(address){
   connectIcon.textContent = '🟢';
   connectFloating.classList.add('connected');
   connectFloating.setAttribute('aria-expanded','false');
-  // show disconnect action on click
   connectFloating.dataset.state = 'connected';
 }
 function setDisconnectedUI(){
@@ -495,19 +490,17 @@ let ethersProvider = null;
 let signer = null;
 let userAddress = null;
 let connectorType = null; // 'injected' | 'walletconnect' | 'deep' etc
+let modalConnector = null;
 
 /* ====== CHAIN UTIL ====== */
 async function ensurePolygonNetwork(p){
-  // p is EIP-1193 compatible provider (window.ethereum or walletconnect provider)
   try{
     const chainId = await p.request({ method: 'eth_chainId' });
     if(chainId === CHAIN_ID_HEX || Number(chainId) === CHAIN_ID) return true;
-    // attempt to switch
     try {
       await p.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: CHAIN_ID_HEX }]});
       return true;
     } catch(switchErr){
-      // if chain not added, try to add
       try {
         await p.request({
           method: 'wallet_addEthereumChain',
@@ -529,10 +522,24 @@ async function ensurePolygonNetwork(p){
   }
 }
 
+/* ====== UTIL: DYNAMIC SCRIPT LOADER ====== */
+function loadScript(src, id){
+  return new Promise((resolve, reject)=>{
+    if(id && document.getElementById(id)) return resolve();
+    const s = document.createElement('script');
+    s.src = src;
+    if(id) s.id = id;
+    s.async = true;
+    s.onload = ()=>resolve();
+    s.onerror = (e)=>reject(new Error('Failed to load ' + src));
+    document.head.appendChild(s);
+  });
+}
+
 /* ====== INJECTED CONNECT (MetaMask / Coinbase Wallet extension / Trust when injected) ====== */
 async function connectInjected(){
   try {
-    if(!window.ethereum) throw new Error('No injected wallet found');
+    if(!window.ethereum) throw new Error('No injected wallet found (MetaMask / Coinbase).');
     const p = window.ethereum;
     // request accounts
     const accounts = await p.request({ method: 'eth_requestAccounts' });
@@ -545,7 +552,7 @@ async function connectInjected(){
     userAddress = await signer.getAddress();
     currentProvider = p;
     connectorType = 'injected';
-    saveState({ type: connectorType, ts: Date.now() });
+    saveState({ type: connectorType, ts: Date.now(), address: userAddress });
     setConnectedUI(userAddress);
     showToast('Connected to injected wallet: ' + shortAddr(userAddress));
     // listen for account / chain changes
@@ -559,84 +566,111 @@ async function connectInjected(){
   }
 }
 
-/* ====== WALLETCONNECT v2 via Web3Modal Standalone (attempt) ======
-   This block uses @web3modal/standalone if available as a UMD module via CDN.
-   If it's not available we gracefully fail to injected or deep links.
-   The approach below tries to be robust but avoids heavy framework integration.
+/* ====== WALLETCONNECT QR (fallback implementation) ======
+   This uses the WalletConnect v1 provider UMD (simpler fallback) when Web3Modal standalone isn't available.
+   It opens a QR code for desktop/mobile wallet scanning.
 */
-let modalConnector = null;
-async function connectWalletConnectModal(){
+async function connectWalletConnectQR(){
   try {
-    // attempt to import Web3Modal Standalone from CDN using dynamic module import
-    // Many CDNs provide ESM bundled entry; try common unpkg path.
-    const MOD_URL = 'https://unpkg.com/@web3modal/standalone@2.5.0/dist/index.umd.min.js';
-    // If the global Web3ModalStandalone is available, use it; otherwise load script dynamically
-    if(typeof window.Web3ModalStandalone === 'undefined'){
-      await loadScript(MOD_URL, 'web3modal-standalone');
+    // Try to use an already loaded provider if present
+    const WCPGlobal = window.WalletConnectProvider || (window.WalletConnectProvider && window.WalletConnectProvider.default) || null;
+    if(!WCPGlobal){
+      // load UMD from jsdelivr
+      await loadScript('https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js', 'walletconnect-provider');
     }
-    if(typeof window.Web3ModalStandalone === 'undefined'){
-      throw new Error('Web3Modal standalone not available');
-    }
-    const W3M = window.Web3ModalStandalone;
-    // create modal with projectId (WalletConnect v2) and theme vars to match our purple glass
-    modalConnector = new W3M.Web3Modal({
-      projectId: WALLETCONNECT_PROJECT_ID,
-      themeMode: 'dark',
-      themeVariables: {
-        // override a few theme vars (fallbacks applied by lib)
-        '--w3m-accent-color': '#b445ff',
-        '--w3m-background-color': 'rgba(255,255,255,0.02)',
-      },
-      // recommended optional: set wallet order or mobile links handled by lib
+    const WalletConnectProvider = window.WalletConnectProvider || window.WalletConnectProvider?.default;
+    if(!WalletConnectProvider) throw new Error('WalletConnect provider failed to load.');
+
+    // instantiate provider with RPC mapping so WalletConnect can connect to Polygon
+    const wcProvider = new WalletConnectProvider({
+      rpc: { 137: RPC_URL },
+      chainId: CHAIN_ID,
+      qrcode: true
     });
-    const connection = await modalConnector.connect();
-    // connection should be an object with provider or returned accounts; adapt to EIP-1193 if possible
-    // Many Web3Modal implementations return a provider at connection.provider
-    const prov = connection?.provider || connection;
-    if(!prov) throw new Error('No provider from modal');
-    // ensure polygon
-    await ensurePolygonNetwork(prov);
-    ethersProvider = new ethers.providers.Web3Provider(prov, 'any');
+
+    await wcProvider.enable(); // opens QR
+    // wrap with ethers
+    ethersProvider = new ethers.providers.Web3Provider(wcProvider, 'any');
     signer = ethersProvider.getSigner();
     userAddress = await signer.getAddress();
-    currentProvider = prov;
+    currentProvider = wcProvider;
     connectorType = 'walletconnect';
-    saveState({ type: connectorType, ts: Date.now() });
-    // attach disconnect handler if possible
-    if(prov.on) {
-      prov.on('disconnect', handleDisconnect);
-      prov.on('accountsChanged', handleAccountsChanged);
-      prov.on('chainChanged', handleChainChanged);
+    saveState({ type: connectorType, ts: Date.now(), address: userAddress });
+    // handlers
+    if(wcProvider.on){
+      wcProvider.on('disconnect', handleDisconnect);
+      wcProvider.on('accountsChanged', handleAccountsChanged);
+      wcProvider.on('chainChanged', handleChainChanged);
     }
     setConnectedUI(userAddress);
     showToast('Connected via WalletConnect: ' + shortAddr(userAddress));
     return true;
   } catch(err){
-    console.warn('connectWalletConnectModal error', err);
-    showToast('WalletConnect failed: ' + (err.message||err));
+    console.warn('connectWalletConnectQR error', err);
+    showToast('WalletConnect (QR) failed: ' + (err.message||err));
     throw err;
   }
 }
 
-/* utility to dynamically load a script (UMD) and wait */
-function loadScript(src, id){
-  return new Promise((resolve, reject)=>{
-    if(document.getElementById(id)) return resolve();
-    const s = document.createElement('script');
-    s.src = src;
-    if(id) s.id = id;
-    s.onload = ()=>resolve();
-    s.onerror = (e)=>reject(new Error('Failed to load ' + src));
-    document.head.appendChild(s);
-  });
+/* ====== WEB3MODAL attempt (best-effort) ====== */
+async function connectWalletConnectModal(){
+  try {
+    // try Web3Modal Standalone UMD first (if present)
+    const MOD_URL = 'https://unpkg.com/@web3modal/standalone@2.5.0/dist/index.umd.min.js';
+    if(typeof window.Web3ModalStandalone === 'undefined'){
+      try{ await loadScript(MOD_URL, 'web3modal-standalone'); }catch(e){ /* ignore */ }
+    }
+    if(typeof window.Web3ModalStandalone !== 'undefined'){
+      const W3M = window.Web3ModalStandalone;
+      modalConnector = new W3M.Web3Modal({
+        projectId: WALLETCONNECT_PROJECT_ID,
+        themeMode: 'dark',
+        themeVariables: {
+          '--w3m-accent-color': '#b445ff',
+          '--w3m-background-color': 'rgba(255,255,255,0.02)',
+        }
+      });
+      const connection = await modalConnector.connect();
+      const prov = connection?.provider || connection;
+      if(!prov) throw new Error('No provider from Web3Modal connection');
+      // ensure polygon
+      await ensurePolygonNetwork(prov);
+      ethersProvider = new ethers.providers.Web3Provider(prov, 'any');
+      signer = ethersProvider.getSigner();
+      userAddress = await signer.getAddress();
+      currentProvider = prov;
+      connectorType = 'walletconnect';
+      saveState({ type: connectorType, ts: Date.now(), address: userAddress });
+      if(prov.on){
+        prov.on('disconnect', handleDisconnect);
+        prov.on('accountsChanged', handleAccountsChanged);
+        prov.on('chainChanged', handleChainChanged);
+      }
+      setConnectedUI(userAddress);
+      showToast('Connected via WalletConnect (modal): ' + shortAddr(userAddress));
+      return true;
+    } else {
+      // Web3Modal not available — fallback to QR provider implementation
+      return await connectWalletConnectQR();
+    }
+  } catch(err){
+    console.warn('connectWalletConnectModal error', err);
+    // final fallback
+    try {
+      return await connectWalletConnectQR();
+    } catch(e){
+      showToast('WalletConnect failed: ' + (e.message||e));
+      throw e;
+    }
+  }
 }
 
 /* ====== DEEP LINKS (mobile) ====== */
 const DEEP_LINKS = [
-  { name: 'MetaMask', scheme: 'metamask://', url: 'https://metamask.app.link/wc?uri=' },
-  { name: 'Trust Wallet', scheme: 'trust://', url: 'trust://'},
-  { name: 'Rainbow', scheme: 'rainbow://', url: 'rainbow://'},
-  { name: 'Coinbase Wallet', scheme: 'coinbase://', url: 'coinbase://'},
+  { name: 'MetaMask', scheme: 'metamask://', url: 'https://metamask.app.link/' },
+  { name: 'Trust Wallet', scheme: 'trust://', url: 'trust://' },
+  { name: 'Rainbow', scheme: 'rainbow://', url: 'rainbow://' },
+  { name: 'Coinbase Wallet', scheme: 'coinbase://', url: 'coinbase://' },
 ];
 
 /* Provide options list in UI for users to pick a connector */
@@ -659,7 +693,7 @@ function renderWalletOptions(){
     const a = document.createElement('a');
     a.href = dl.scheme;
     a.textContent = dl.name + ' (Deep Link)';
-    a.onclick = (e)=>{ /* let it attempt */ };
+    a.onclick = (e)=>{ /* let it attempt; do not prevent default so mobile apps may open */ };
     walletOptions.appendChild(a);
   });
 
@@ -673,11 +707,10 @@ function renderWalletOptions(){
 /* ====== EVENT HANDLERS ====== */
 async function handleDisconnect(){
   try {
-    // try to disconnect politely if WalletConnect provider present
-    if(connectorType === 'walletconnect' && modalConnector && modalConnector.close) {
-      try { await modalConnector.close(); } catch(e){}
+    if(connectorType === 'walletconnect' && currentProvider && currentProvider.close){
+      try { await currentProvider.close(); } catch(e){}
     }
-    if(currentProvider && currentProvider.disconnect){
+    if(currentProvider && currentProvider.disconnect && typeof currentProvider.disconnect === 'function'){
       try{ await currentProvider.disconnect(); }catch(e){}
     }
   } catch(e){
@@ -689,6 +722,7 @@ async function handleDisconnect(){
     signer = null;
     userAddress = null;
     connectorType = null;
+    modalConnector = null;
     clearState();
     setDisconnectedUI();
     showToast('Disconnected');
@@ -698,7 +732,6 @@ async function handleDisconnect(){
 async function handleAccountsChanged(accounts){
   try{
     if(!accounts || accounts.length === 0){
-      // disconnected at wallet level
       await handleDisconnect();
       return;
     }
@@ -722,15 +755,19 @@ async function handleChainChanged(chainId){
 
 /* ====== ATTACH UI BEHAVIOR ====== */
 renderWalletOptions();
+/* prevent click bubbling to document when using walletOptions */
+walletOptions.addEventListener('click', (ev)=>{ ev.stopPropagation(); });
+
 connectFloating.addEventListener('click', async (e)=>{
+  e.stopPropagation();
   const state = connectFloating.dataset.state;
-  // if connected -> disconnect
   if(state === 'connected'){
     await handleDisconnect();
     return;
   }
   // toggle options
-  walletOptions.style.display = (walletOptions.style.display === 'block') ? 'none' : 'block';
+  const showing = (walletOptions.style.display === 'block');
+  walletOptions.style.display = showing ? 'none' : 'block';
   connectFloating.setAttribute('aria-expanded', walletOptions.style.display === 'block' ? 'true' : 'false');
 });
 
@@ -743,14 +780,12 @@ document.addEventListener('click', (e)=>{
 async function tryAutoReconnect(){
   const st = loadState();
   if(!st || !st.type) return;
-  // prefer injected if type is injected and window.ethereum present
   try{
     if(st.type === 'injected' && window.ethereum){
-      await connectInjected();
-      return;
+      // try to set UI quickly, then reconnect on user action if needed
+      try { await connectInjected(); return; } catch(e){ console.warn('Auto reconnect injected failed', e); }
     }
     if(st.type === 'walletconnect'){
-      // try to re-open WalletConnect modal provider silently (some implementations allow connect with pairing)
       try {
         await connectWalletConnectModal();
         return;
@@ -763,7 +798,6 @@ async function tryAutoReconnect(){
 
 /* run auto reconnect on page load */
 window.addEventListener('load', ()=>{ 
-  // load previously saved state; try to reconnect
   tryAutoReconnect().catch(e=>{ console.warn('reconnect error', e); });
   const st = loadState();
   if(st && st.type && st.address){
@@ -793,6 +827,7 @@ async function safeExec(fn, onErrorMsg){
 window.NOLA_WALLET = {
   connectInjected,
   connectWalletConnectModal,
+  connectWalletConnectQR,
   disconnect: handleDisconnect,
   getAddress: ()=> userAddress,
   getProvider: ()=> currentProvider,
@@ -800,11 +835,11 @@ window.NOLA_WALLET = {
 };
 </script>
 
-<!-- Existing chat + supabase logic (unchanged) -->
+<!-- Existing chat + supabase logic (unchanged, but with robust handling) -->
 <script>
 /* ====== CONFIG ====== */
 const SUPABASE_URL = "https://qnpeauoskuipzcoaqbpy.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFucGVhdW9za3VpcHpjb2FxYnB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0MDU2MjksImV4cCI6MjA3OTk4MTYyOX0.zduOSQAt7FALN[...]";
+const SUPABASE_KEY = "REDACTED_FOR_SAFETY_REPLACE_WITH_REAL_KEY";
 
 /* ====== INIT CLIENT ====== */
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -878,6 +913,8 @@ function renderMessage(msg){
 
   const el = document.createElement('div');
   el.className = 'chat-msg';
+  el.style.padding = '8px';
+  el.style.borderBottom = '1px solid rgba(255,255,255,0.02)';
 
   const userEsc = escapeHtml(msg.user || 'Anon');
   const textEsc = escapeHtml(msg.text || '');
@@ -933,7 +970,7 @@ async function loadHistory(){
   }
 }
 
-/* ====== Polling: fetch new messages every 1.5s ====== */
+/* ====== Polling: fetch new messages every 0.6s ====== */
 async function fetchNewMessages() {
     try {
         const { data, error } = await supabase
@@ -957,9 +994,8 @@ async function fetchNewMessages() {
 setInterval(fetchNewMessages, 600);
 
 /* ====== Send message ====== */
-/* ====== Send message (robust: always clears and focuses) ====== */
 let sending = false;
-sendChatBtn.addEventListener('click', async () => {
+sendChatBtn && sendChatBtn.addEventListener('click', async () => {
   const text = (chatInput.value || '').trim();
   if (!text) { chatInput.focus(); return; }
   if (!chatUser) {
@@ -982,13 +1018,11 @@ sendChatBtn.addEventListener('click', async () => {
       // local echo
       renderMessage(data[0]);
     }
-    // Clear and focus regardless of success so user can continue typing
     chatInput.value = '';
     chatInput.focus();
   } catch (e) {
     console.error('Send exception', e);
     showToast('Send failed', { type: 'error' });
-    // still clear the input so the user can retry
     chatInput.value = '';
     chatInput.focus();
   } finally {
@@ -998,33 +1032,29 @@ sendChatBtn.addEventListener('click', async () => {
 });
 
 /* ====== Send on Enter ====== */
-chatInput.addEventListener('keydown', (e)=>{
+chatInput && chatInput.addEventListener('keydown', (e)=> {
   if(e.key === 'Enter' && !e.shiftKey){
     e.preventDefault();
-    sendChatBtn.click();
+    sendChatBtn && sendChatBtn.click();
   }
 });
 
-/* ====== Toggle chat sidebar ====== */
-chatToggle && chatToggle.addEventListener('click', () => {
-  chatSidebar.classList.toggle('open');
-});
-
-/* ====== Open chat when user taps main area (per your request) ====== */
-document.querySelectorAll('.section-wrapper, .container').forEach(el=>{
-  el.addEventListener('click', (e) => {
-    // if click was inside suggestions or inputs, don't auto-open
-    const insideSuggestion = !!e.target.closest('.suggestions');
-    const insideInput = !!e.target.closest('input, button, .glassy-btn, .quick-cta');
-    if (insideSuggestion || insideInput) return;
-    chatSidebar.classList.remove('open');
-  });
-});
-
-/* ====== Init chat ====== */ 
+/* ====== Chat init ====== */
 async function initChat(){
-  await loadHistory();
+  try {
+    await loadHistory();
+    // ensure polling starts
+    fetchNewMessages();
+    chatSidebar.style.display = 'block';
+  } catch(e){
+    console.warn('initChat error', e);
+  }
 }
+
+/* Chat toggle */
+chatToggle.addEventListener('click', ()=>{
+  chatSidebar.style.display = chatSidebar.style.display === 'block' ? 'none' : 'block';
+});
 </script>
 
 </body>
