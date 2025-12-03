@@ -1,0 +1,1031 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>NOLA Exchange — Full (Enhanced)</title>
+<style>
+/* ===== RESET & THEME ===== */
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Arial',sans-serif}
+html,body{height:100%}
+body{
+  /* Disable page scrolling by default — suggestions & chat keep their own scroll */
+  overflow:hidden;
+  background:radial-gradient(circle at center,#0c0014,#1a002b 80%);
+  color:#fff;scroll-behavior:smooth;min-height:100vh;
+}
+:root{
+  --accent-1:#b445ff;--accent-2:#7013ff;
+  --glass:rgba(255,255,255,0.05);--glass-2:rgba(255,255,255,0.03);
+  --suggest-bg:rgba(25,0,50,0.98);
+  --shadow:0 0 25px rgba(180,0,255,0.3);
+  --container-max:520px;
+  --glass-btn-bg:rgba(255,255,255,0.03);
+  --glass-btn-border:rgba(255,255,255,0.06);
+  --yellow-cta:#ffcf33;
+  --toast-info-grad: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  --disabled-glass: rgba(255,255,255,0.02);
+  --focus-ring: 0 0 0 4px rgba(180,68,255,0.08);
+  --nola-watermark-color: rgba(180,68,255,0.06);
+}
+
+/* NEBULA + PARTICLES */
+body::before{content:'';position:fixed;left:-50%;top:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(150,0,255,0.12),transparent 60%);animation:nebulaMove 35s infinite alternate ease-in-out;z-index:0}
+@keyframes nebulaMove{0%{transform:translate(-10%,-10%)}100%{transform:translate(5%,5%)}}
+.particle{position:absolute;width:4px;height:3px;background:#b445ff;border-radius:50%;opacity:0.8;animation:floatParticle linear infinite;z-index:-1}
+@keyframes floatParticle{0%{transform:translateY(0) translateX(0);opacity:0.8}50%{transform:translateY(-50px) translateX(20px);opacity:0.4}100%{transform:translateY(0) translateX(0);opacity:0.8}}
+
+/* NOLA WATERMARK (centered subtle) */
+.nola-watermark{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);font-size:120px;font-weight:900;color:var(--nola-watermark-color);pointer-events:none;z-index:0;user-select:none;letter-spacing:6px}
+
+/* TOP LOGO moved down to sit above section */
+.logo{
+  width:84px;height:auto;display:block;margin:0 auto;pointer-events:none;
+  animation:logoGlow 25s ease-in-out infinite alternate,logoRotate 45s linear infinite;
+  z-index:998;position:fixed;left:50%;top:8vh;transform:translateX(-50%);
+}
+@keyframes logoGlow{0%{filter:drop-shadow(0 0 12px #9c00ff)}50%{filter:drop-shadow(0 0 30px #d15fff)}100%{filter:drop-shadow(0 0 12px #9c00ff)}}
+@keyframes logoRotate{0%{transform:translateX(-50%) rotateY(0deg)}100%{transform:translateX(-50%) rotateY(360deg)}}
+
+/* SECTION WRAPPER - CENTER EVERYTHING */
+.section-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;   /* content stays at the top */
+  justify-content: center;
+  gap: 18px;
+  padding: 28px;
+
+  margin-top: 20vh;          /* move the whole section UP the page */
+  position: relative;
+  z-index: 1;
+}
+
+/* CARD */
+.container{width:90%;max-width:var(--container-max);margin:9px;background:var(--glass);border:1px solid rgba(255,255,255,0.08);border-radius:25px;padding:22px;backdrop-filter:blur(18px);box-shadow:var(--shadow);position:relative;z-index:5;}
+
+/* connected chip sliding animation */
+.addr-chip {
+  padding:8px 12px;border-radius:12px;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));font-weight:700;color:#fff;display:none;align-items:center;gap:10px;box-shadow:0 8px 28px rgba(110,0,255,0.18);
+  transition:transform 320ms cubic-bezier(.2,.9,.2,1),opacity 240ms ease,right 240ms ease;
+}
+.addr-chip.show{display:inline-flex;opacity:1;transform:translateY(0)}
+.addr-chip.hide{opacity:0;transform:translateY(-10px);display:inline-flex}
+
+/* pulsing green dot */
+.pulse-dot{width:10px;height:10px;border-radius:999px;background:#20c997;box-shadow:0 0 0 6px rgba(32,201,151,0.12);position:relative;display:inline-block;animation:ping 1500ms infinite;}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(32,201,151,0.14)}70%{box-shadow:0 0 0 10px rgba(32,201,151,0)}100%{box-shadow:0 0 0 0 rgba(32,201,151,0)}}
+
+/* UNIFIED ROW - compact "thin bar" look */
+.input-box{margin-top:14px;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:10px;position:relative;box-shadow:0 6px 18px rgba(0,0,0,0.35)}
+.input-box .left{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
+
+/* chosen tokens: professional rounded-rectangle icons (not circular) */
+.token-icon{width:36px;height:36px;border-radius:8px;background:transparent;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;position:relative;border:1px solid rgba(255,255,255,0.04)}
+.token-icon img{width:100%;height:100%;object-fit:cover;display:block;border-radius:8px;z-index:6}
+.token-chip{position:absolute;right:-8px;bottom:-8px;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));padding:3px 7px;border-radius:999px;font-weight:800;font-size:10px;color:#fff;box-shadow:0 4px 14px rgba(180,0,255,0.12)}
+
+/* SUGGESTIONS container (internal scroll only) */
+.suggestions{position:absolute;top:68px;left:12px;right:12px;background:var(--suggest-bg);border-radius:12px;padding:6px;max-height:240px;overflow:auto;display:none;z-index:220;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
+.suggestion-item{display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;cursor:pointer;justify-content:space-between}
+.suggestion-item:hover{background:linear-gradient(90deg, rgba(180,68,255,0.06), rgba(112,19,255,0.04))}
+.suggestion-left{display:flex;align-items:center;gap:10px;min-width:0}
+.suggestion-left img{width:28px;height:28px;border-radius:50%;object-fit:cover}
+.suggestion-main{display:flex;flex-direction:column;min-width:0}
+.suggestion-symbol{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.suggestion-name{font-size:12px;opacity:0.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.suggestion-price-pill{min-width:70px;text-align:right;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.03);font-weight:700;font-size:12px}
+
+/* INPUT BLOCK (single visible text input per row) */
+.input-field{display:flex;flex-direction:column;min-width:0;width:100%}
+.input-field input[type="text"]{padding:8px 10px;border-radius:8px;border:none;background:transparent;color:#fff;width:100%;outline:none;font-size:14px}
+.input-amount{margin-left:8px;min-width:120px}
+.input-amount input{width:100%;padding:8px 10px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:#fff;font-size:14px;outline:none}
+
+/* small price area under amount/estimate - align to right without covering icons */
+.price-small{display:flex;flex-direction:column;align-items:flex-end;margin-left:auto;margin-top:6px;min-width:120px;z-index:2}
+.price-small .price-usd{font-size:12px;opacity:0.85}
+.price-small .price-unit{font-size:12px;opacity:0.65}
+
+/* SWAP CONTROLS */
+.controls{margin-top:14px;display:flex;align-items:center;gap:12px;justify-content:space-between}
+.swap-outside{
+  width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);cursor:pointer
+}
+.swap-outside:active{transform:translateY(1px);box-shadow:none}
+
+/* custom slippage dropdown */
+.slippage-wrap{position:relative;display:inline-block}
+.slippage-display{
+  padding:8px 12px;border-radius:10px;background:var(--glass);color:#fff;border:0;font-weight:800;font-size:13px;box-shadow:0 8px 22px rgba(106,0,255,0.12);cursor:pointer;display:flex;align-items:center;gap:8px
+}
+.slippage-list{position:absolute;right:0;top:calc(100% + 8px);background:var(--glass);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:6px;box-shadow:var(--shadow);min-width:120px;display:none}
+.slippage-item{padding:8px 10px;border-radius:8px;cursor:pointer;font-weight:700;white-space:nowrap}
+.slippage-item:hover{background:linear-gradient(90deg, rgba(180,68,255,0.06), rgba(112,19,255,0.04))}
+
+/* GLASSY BUTTON (replaces electric pill) */
+.glassy-btn{
+  display:inline-flex; align-items:center; gap:10px; padding:10px 20px; border-radius:12px;
+  background:var(--glass-btn-bg); border:1px solid var(--glass-btn-border);
+  color:#fff; font-weight:800; font-size:15px; cursor:pointer;
+  transition:transform 120ms ease,box-shadow 120ms ease,background 120ms ease; backdrop-filter: blur(6px);
+}
+.glassy-btn:active{transform:translateY(1px);box-shadow:none}
+.glassy-btn[disabled]{opacity:0.45;cursor:not-allowed;box-shadow:none;border:1px solid rgba(255,255,255,0.02);background:var(--disabled-glass)}
+.glassy-btn.connected{background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:#fff;}
+
+/* center main swap button */
+.swap-row{margin-top:14px;display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap}
+
+/* yellow quick-swap CTA */
+.quick-cta{
+  background: linear-gradient(90deg,var(--yellow-cta),#f7b400);
+  color:#1b1b1b; padding:10px 16px; border-radius:12px; border:none; font-weight:900; cursor:pointer;
+  display:inline-flex; gap:8px; align-items:center;
+  box-shadow: 0 10px 30px rgba(255,200,50,0.12);
+}
+.quick-cta:active{transform:translateY(1px);box-shadow:none}
+.quick-cta[disabled]{opacity:0.5;cursor:not-allowed}
+
+/* tiny glassy tooltip / toast */
+.toast{position:fixed;right:18px;bottom:90px;z-index:9999;padding:12px 18px;border-radius:12px;background:var(--toast-info-grad);backdrop-filter:blur(8px);box-shadow:0 10px 40px rgba(0,0,0,0.5);color:#fff}
+.toast a{color:#fff;font-weight:900;text-decoration:underline}
+
+/* TOP-RIGHT CONNECT */
+.top-right-connect{position:fixed;right:18px;top:18px;z-index:70;display:flex;gap:10px;align-items:center}
+.connect-floating{background:linear-gradient(90deg,var(--glass-btn-bg),var(--glass-btn-bg));color:#fff;padding:10px 14px;border-radius:12px;border:1px solid var(--glass-btn-border);cursor:pointer;font-weight:900;display:inline-flex;align-items:center;gap:8px}
+.connect-floating:hover{transform:scale(1.03);box-shadow:0 12px 30px rgba(100,20,120,0.12)}
+
+/* connected disconnect button */
+.disconnect-btn{background:linear-gradient(90deg,#ff5b71,#ff3b5b);color:#fff;padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:800}
+.disconnect-btn:active{transform:translateY(1px)}
+
+/* wallet options dropdown (for mobile deep-links) */
+.wallet-opts{position:absolute;right:18px;top:66px;background:var(--glass);border-radius:12px;padding:10px;border:1px solid rgba(255,255,255,0.05);display:none;z-index:120}
+.wallet-opts a{display:block;color:#fff;padding:8px;border-radius:8px;text-decoration:none;font-weight:700}
+.wallet-opts a:hover{background:rgba(255,255,255,0.02)}
+
+/* small screen polish */
+@media(max-width:720px){
+  .section-wrapper{padding:18px;gap:12px;flex-direction:column-reverse}
+  .container{width:100%;max-width:520px}
+  .input-box .token-chip{font-size:10px;padding:3px 6px;right:-4px;bottom:-4px}
+  .logo{top:6vh;width:72px}
+}
+
+/* Keep main container centered with its own scroll area if needed */
+.section-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;   /* content stays at the top */
+  justify-content: center;
+  gap: 18px;
+  padding: 28px;
+
+  margin-top: 20vh;          /* move the whole section UP the page */
+  position: relative;
+  z-index: 1;
+}
+
+/* Allow suggestions and chat messages areas to scroll independently */
+.suggestions { max-height: 360px; overflow-y: auto; -webkit-overflow-scrolling:touch; }
+.chat-sidebar #chatMessages { overflow-y: auto; max-height: calc(100vh - 220px); -webkit-overflow-scrolling:touch; }
+
+/* spinner */
+.btn-spinner{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,0.2);border-top-color:rgba(255,255,255,1);animation:spin 700ms linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Button accessibility & tap fixes */
+button,
+button[class],
+.glassy-btn,
+.quick-cta,
+.connect-floating,
+.swap-outside,
+.chat-toggle,
+.slippage-display,
+.slippage-item,
+input[type="button"],
+input[type="submit"],
+a.button,
+a.btn {
+  -webkit-tap-highlight-color: transparent;
+  outline: none !important;
+  -webkit-focus-ring-color: transparent;
+  -webkit-appearance: none;
+  touch-action: manipulation;
+  user-select: none;
+  transition: transform 120ms cubic-bezier(.2,.9,.2,1), box-shadow 120ms ease, opacity 120ms ease;
+  will-change: transform, box-shadow;
+}
+
+/* Keep keyboard focus visible and accessible, but subtle & theme-matching */
+button:focus-visible,
+.glassy-btn:focus-visible,
+.quick-cta:focus-visible,
+.connect-floating:focus-visible,
+.swap-outside:focus-visible,
+.chat-toggle:focus-visible,
+.slippage-display:focus-visible,
+.slippage-item:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 6px rgba(180,68,255,0.08), 0 10px 30px rgba(106,0,255,0.06);
+  border-radius: 12px;
+}
+</style>
+</head>
+<body>
+
+<!-- particles -->
+<img id="logoFloat" class="logo" src="logo.gif" alt="NOLA Logo">
+
+<!-- NOLA watermark -->
+<div class="nola-watermark">NOLA</div>
+
+<!-- top-right connect -->
+<div class="top-right-connect" aria-live="polite">
+  <div id="addrChip" class="addr-chip" aria-hidden="true" role="status">
+    <span id="pulse" class="pulse-dot" style="display:none"></span>
+    <span id="addrText" style="font-family:monospace"></span>
+  </div>
+
+  <button id="connectFloating" class="connect-floating glassy-btn" title="Connect Wallet" aria-haspopup="dialog" aria-expanded="false" aria-controls="walletOptions">
+    <span id="connectIcon" style="margin-right:8px">🔌</span>
+    <span id="connectLabel">Connect Wallet</span>
+  </button>
+
+  <div id="walletOptions" class="wallet-opts" aria-hidden="true" role="menu">
+    <!-- these get populated by JS for deep links & connectors -->
+  </div>
+</div>
+
+<!-- SECTION WRAPPER centers card and swap control -->
+<div class="section-wrapper">
+  <div class="container" role="main" aria-label="NOLA Exchange">
+    <h2>NOLA Exchange</h2>
+
+    <!-- FROM -->
+    <div class="input-box" id="fromBox" style="position:relative;">
+      <div class="left">
+        <div class="token-icon" id="fromIcon">
+          <img id="fromLogo" src="" alt="" style="display:none">
+          <span class="token-chip" id="fromChip" style="display:none"></span>
+        </div>
+
+        <div class="token-info">
+          <div class="token-symbol" id="fromSymbol">Select</div>
+          <div class="token-change" id="fromChange" style="display:none">+0.00%</div>
+        </div>
+
+        <div class="input-field">
+          <input id="fromToken" placeholder="symbol" style="padding:10px 12px;border-radius:8px;border:none;background:transparent;color:#fff;width:100%">
+        </div>
+
+        <div class="input-amount" style="min-width:120px;">
+          <input id="fromAmount" placeholder="Amount" type="number" step="any" min="0">
+        </div>
+
+        <div class="price-small">
+          <div id="fromUsdSmall" class="price-usd" style="display:none">≈ $—</div>
+          <div id="fromUnitSmall" class="price-unit" style="display:none">— / unit</div>
+        </div>
+
+      </div>
+      <div class="suggestions" id="fromSuggestions" data-side="from" tabindex="-1"></div>
+    </div>
+
+    <!-- TO -->
+    <div class="input-box" id="toBox" style="position:relative;margin-top:12px;">
+      <div class="left">
+        <div class="token-icon" id="toIcon">
+          <img id="toLogo" src="" alt="" style="display:none">
+          <span class="token-chip" id="toChip" style="display:none"></span>
+        </div>
+
+        <div class="token-info">
+          <div class="token-symbol" id="toSymbol">Select</div>
+          <div class="token-change" id="toChange" style="display:none">+0.00%</div>
+        </div>
+
+        <div class="input-field">
+          <input id="toToken" placeholder="symbol" style="padding:10px 12px;border-radius:8px;border:none;background:transparent;color:#fff;width:100%">
+        </div>
+
+        <div class="input-amount" style="min-width:120px;">
+          <input id="toAmount" placeholder="Estimate" readonly>
+        </div>
+
+        <div class="price-small">
+          <div id="toUsdSmall" class="price-usd" style="display:none">≈ $—</div>
+          <div id="toUnitSmall" class="price-unit" style="display:none">— / unit</div>
+        </div>
+
+      </div>
+      <div class="suggestions" id="toSuggestions" data-side="to" tabindex="-1"></div>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="controls" style="margin-top:14px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div id="swapOutside" class="swap-outside" title="Swap From ↔ To">⇅</div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;">
+        <!-- custom slippage -->
+        <div class="slippage-wrap" id="slippageWrap" aria-label="Slippage">
+          <div id="slippageDisplay" class="slippage-display" role="button" aria-haspopup="listbox" aria-expanded="false">
+            <span id="slippageLabel">1%</span>
+          </div>
+          <div id="slippageList" class="slippage-list" role="listbox" tabindex="-1">
+            <div class="slippage-item" data-value="0.5">0.5%</div>
+            <div class="slippage-item" data-value="1">1%</div>
+            <div class="slippage-item" data-value="2">2%</div>
+            <div class="slippage-item" data-value="3">3%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="swap-row" style="margin-top:8px;">
+      <!-- main swap button (centered) -->
+      <button id="swapBtn" class="glassy-btn" title="Swap">
+        <span class="icon">⇄</span>
+        <span class="label">Swap</span>
+        <span id="swapSpinner" style="margin-left:8px;display:none" class="btn-spinner"></span>
+      </button>
+    </div>
+
+    <!-- quick swap placed visually under slippage (still within same container) -->
+    <div style="display:flex;justify-content:flex-end;margin-top:10px;">
+      <button id="quickSwapBtn" class="quick-cta" title="Quick Swap (uses cached quote)">
+        <span id="quickLabel">Quick Swap</span>
+        <span id="quickSpinner" style="display:none" class="btn-spinner"></span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- toast container -->
+<div id="toastRoot" style="pointer-events:none;position:fixed;right:18px;bottom:90px;z-index:9999"></div>
+  
+<!-- CHAT TOGGLE BUTTON -->
+<div class="chat-toggle" id="chatToggle">Public Chat🔘</div>
+
+<!-- CHAT PANEL -->
+<div class="chat-sidebar" id="chatSidebar">
+
+  <h3 style="text-align:center;margin-bottom:10px;">Chat</h3>
+
+  <div id="chatMessages" style="overflow-y:auto; flex:1;"></div>
+
+  <div class="chat-input">
+    <input id="chatInput" placeholder="Drop your alpha...">
+    <button id="sendChat">NOLA</button>
+  </div>
+
+</div>
+
+<!-- USERNAME POPUP -->
+<div id="usernameModal">
+  <div class="modal-content">
+    <h3>Choose a Username</h3>
+    <input id="modalUsername" placeholder="Enter name">
+    <button id="confirmUsername">Say NOLA</button>
+  </div>
+</div>
+<!-- footer -->
+<div class="footer">
+  <div>© 2025 NOLA — All rights reserved</div>
+  <div><a href="terms&privacy.html" id="privacyTerms">Terms&Privacy</a> • <a href="https://x.com/NOLA_CHAIN" id="xLink">X</a> <a href="https:https://t.me/NOLA_community" id="tgLink">Telegram</a></div>
+</div>
+
+<!-- LIBS -->
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<!-- keep supabase chat intact -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+/* ====== CONFIG ====== */
+const RPC_URL = "https://polygon-mainnet.g.alchemy.com/v2/8ikEzpLeLerL-8xNW23fVUser";
+const CHAIN_ID = 137;
+const CHAIN_ID_HEX = '0x89';
+const WALLETCONNECT_PROJECT_ID = '6557a92e369812727669d41cbeb95a1';
+
+/* ====== ELEMENTS ====== */
+const connectFloating = document.getElementById('connectFloating');
+const connectLabel = document.getElementById('connectLabel');
+const connectIcon = document.getElementById('connectIcon');
+const walletOptions = document.getElementById('walletOptions');
+
+const addrChip = document.getElementById('addrChip');
+const addrText = document.getElementById('addrText');
+const pulseDot = document.getElementById('pulse');
+
+const toastRoot = document.getElementById('toastRoot');
+
+/* ====== TOAST (re-usable) ====== */
+let _toastQueue = [];
+let _toastVisible = false;
+function showToast(msg, opts = {}) {
+  opts = Object.assign({ttl:5000, type:'info'}, opts);
+  _toastQueue.push({msg, opts});
+  if (!_toastVisible) _processToastQueue();
+}
+function _processToastQueue(){
+  if (_toastQueue.length === 0) { _toastVisible = false; return; }
+  _toastVisible = true;
+  const item = _toastQueue.shift();
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.style.pointerEvents = 'auto';
+  el.innerHTML = `<div style="display:flex;gap:10px;align-items:center">
+    <div style="flex:1">${item.msg}</div>
+  </div>`;
+  toastRoot.appendChild(el);
+  el.style.opacity = '0';
+  requestAnimationFrame(()=>{ el.style.transition = 'opacity 180ms ease, transform 180ms ease'; el.style.opacity = '1'; el.style.transform = 'translateY(0)'; });
+  setTimeout(()=> {
+    el.style.transition = 'opacity 220ms'; el.style.opacity = '0';
+    setTimeout(()=>{ el.remove(); _processToastQueue(); }, 260);
+  }, item.opts.ttl);
+}
+
+/* ====== HELPERS ====== */
+function shortAddr(a){
+  if(!a) return '';
+  return a.slice(0,6) + '...' + a.slice(-4);
+}
+function setConnectedUI(address){
+  addrText.textContent = shortAddr(address);
+  pulseDot.style.display = 'inline-block';
+  addrChip.classList.add('show');
+  connectLabel.textContent = 'Disconnect';
+  connectIcon.textContent = '🟢';
+  connectFloating.classList.add('connected');
+  connectFloating.setAttribute('aria-expanded','false');
+  // show disconnect action on click
+  connectFloating.dataset.state = 'connected';
+}
+function setDisconnectedUI(){
+  addrText.textContent = '';
+  pulseDot.style.display = 'none';
+  addrChip.classList.remove('show');
+  connectLabel.textContent = 'Connect Wallet';
+  connectIcon.textContent = '🔌';
+  connectFloating.classList.remove('connected');
+  connectFloating.dataset.state = 'disconnected';
+}
+
+/* ====== PERSISTENCE ====== */
+const STORAGE_KEY = 'nola_wallet_state_v1';
+function saveState(obj){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(obj)); }catch(e){}
+}
+function loadState(){
+  try{ const s = localStorage.getItem(STORAGE_KEY); return s ? JSON.parse(s) : null; }catch(e){ return null;}
+}
+function clearState(){
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+}
+
+/* ====== PROVIDER STATE ====== */
+let currentProvider = null; // EIP-1193 provider or walletconnect provider
+let ethersProvider = null;
+let signer = null;
+let userAddress = null;
+let connectorType = null; // 'injected' | 'walletconnect' | 'deep' etc
+
+/* ====== CHAIN UTIL ====== */
+async function ensurePolygonNetwork(p){
+  // p is EIP-1193 compatible provider (window.ethereum or walletconnect provider)
+  try{
+    const chainId = await p.request({ method: 'eth_chainId' });
+    if(chainId === CHAIN_ID_HEX || Number(chainId) === CHAIN_ID) return true;
+    // attempt to switch
+    try {
+      await p.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: CHAIN_ID_HEX }]});
+      return true;
+    } catch(switchErr){
+      // if chain not added, try to add
+      try {
+        await p.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: CHAIN_ID_HEX,
+            chainName: 'Polygon Mainnet',
+            nativeCurrency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 },
+            rpcUrls: [RPC_URL],
+            blockExplorerUrls: ['https://polygonscan.com']
+          }]
+        });
+        return true;
+      } catch(addErr){
+        throw addErr;
+      }
+    }
+  }catch(e){
+    throw e;
+  }
+}
+
+/* ====== INJECTED CONNECT (MetaMask / Coinbase Wallet extension / Trust when injected) ====== */
+async function connectInjected(){
+  try {
+    if(!window.ethereum) throw new Error('No injected wallet found');
+    const p = window.ethereum;
+    // request accounts
+    const accounts = await p.request({ method: 'eth_requestAccounts' });
+    if(!accounts || accounts.length === 0) throw new Error('No account returned');
+    // ensure correct chain
+    await ensurePolygonNetwork(p);
+    // create ethers provider
+    ethersProvider = new ethers.providers.Web3Provider(p, 'any');
+    signer = ethersProvider.getSigner();
+    userAddress = await signer.getAddress();
+    currentProvider = p;
+    connectorType = 'injected';
+    saveState({ type: connectorType, ts: Date.now() });
+    setConnectedUI(userAddress);
+    showToast('Connected to injected wallet: ' + shortAddr(userAddress));
+    // listen for account / chain changes
+    p.on && p.on('accountsChanged', handleAccountsChanged);
+    p.on && p.on('chainChanged', handleChainChanged);
+    return true;
+  } catch(err){
+    console.error('connectInjected error', err);
+    showToast('Failed to connect injected wallet: ' + (err.message||err));
+    throw err;
+  }
+}
+
+/* ====== WALLETCONNECT v2 via Web3Modal Standalone (attempt) ======
+   This block uses @web3modal/standalone if available as a UMD module via CDN.
+   If it's not available we gracefully fail to injected or deep links.
+   The approach below tries to be robust but avoids heavy framework integration.
+*/
+let modalConnector = null;
+async function connectWalletConnectModal(){
+  try {
+    // attempt to import Web3Modal Standalone from CDN using dynamic module import
+    // Many CDNs provide ESM bundled entry; try common unpkg path.
+    const MOD_URL = 'https://unpkg.com/@web3modal/standalone@2.5.0/dist/index.umd.min.js';
+    // If the global Web3ModalStandalone is available, use it; otherwise load script dynamically
+    if(typeof window.Web3ModalStandalone === 'undefined'){
+      await loadScript(MOD_URL, 'web3modal-standalone');
+    }
+    if(typeof window.Web3ModalStandalone === 'undefined'){
+      throw new Error('Web3Modal standalone not available');
+    }
+    const W3M = window.Web3ModalStandalone;
+    // create modal with projectId (WalletConnect v2) and theme vars to match our purple glass
+    modalConnector = new W3M.Web3Modal({
+      projectId: WALLETCONNECT_PROJECT_ID,
+      themeMode: 'dark',
+      themeVariables: {
+        // override a few theme vars (fallbacks applied by lib)
+        '--w3m-accent-color': '#b445ff',
+        '--w3m-background-color': 'rgba(255,255,255,0.02)',
+      },
+      // recommended optional: set wallet order or mobile links handled by lib
+    });
+    const connection = await modalConnector.connect();
+    // connection should be an object with provider or returned accounts; adapt to EIP-1193 if possible
+    // Many Web3Modal implementations return a provider at connection.provider
+    const prov = connection?.provider || connection;
+    if(!prov) throw new Error('No provider from modal');
+    // ensure polygon
+    await ensurePolygonNetwork(prov);
+    ethersProvider = new ethers.providers.Web3Provider(prov, 'any');
+    signer = ethersProvider.getSigner();
+    userAddress = await signer.getAddress();
+    currentProvider = prov;
+    connectorType = 'walletconnect';
+    saveState({ type: connectorType, ts: Date.now() });
+    // attach disconnect handler if possible
+    if(prov.on) {
+      prov.on('disconnect', handleDisconnect);
+      prov.on('accountsChanged', handleAccountsChanged);
+      prov.on('chainChanged', handleChainChanged);
+    }
+    setConnectedUI(userAddress);
+    showToast('Connected via WalletConnect: ' + shortAddr(userAddress));
+    return true;
+  } catch(err){
+    console.warn('connectWalletConnectModal error', err);
+    showToast('WalletConnect failed: ' + (err.message||err));
+    throw err;
+  }
+}
+
+/* utility to dynamically load a script (UMD) and wait */
+function loadScript(src, id){
+  return new Promise((resolve, reject)=>{
+    if(document.getElementById(id)) return resolve();
+    const s = document.createElement('script');
+    s.src = src;
+    if(id) s.id = id;
+    s.onload = ()=>resolve();
+    s.onerror = (e)=>reject(new Error('Failed to load ' + src));
+    document.head.appendChild(s);
+  });
+}
+
+/* ====== DEEP LINKS (mobile) ====== */
+const DEEP_LINKS = [
+  { name: 'MetaMask', scheme: 'metamask://', url: 'https://metamask.app.link/wc?uri=' },
+  { name: 'Trust Wallet', scheme: 'trust://', url: 'trust://'},
+  { name: 'Rainbow', scheme: 'rainbow://', url: 'rainbow://'},
+  { name: 'Coinbase Wallet', scheme: 'coinbase://', url: 'coinbase://'},
+];
+
+/* Provide options list in UI for users to pick a connector */
+function renderWalletOptions(){
+  walletOptions.innerHTML = '';
+  const injectedBtn = document.createElement('a');
+  injectedBtn.href = '#';
+  injectedBtn.textContent = 'MetaMask / Injected';
+  injectedBtn.onclick = async (e)=>{ e.preventDefault(); walletOptions.style.display='none'; try{ await connectInjected(); }catch(e){} };
+  walletOptions.appendChild(injectedBtn);
+
+  const wcBtn = document.createElement('a');
+  wcBtn.href = '#';
+  wcBtn.textContent = 'WalletConnect (QR)';
+  wcBtn.onclick = async (e)=>{ e.preventDefault(); walletOptions.style.display='none'; try{ await connectWalletConnectModal(); }catch(e){} };
+  walletOptions.appendChild(wcBtn);
+
+  // deep links for mobile — open new tab to attempt to trigger app
+  DEEP_LINKS.forEach(dl=>{
+    const a = document.createElement('a');
+    a.href = dl.scheme;
+    a.textContent = dl.name + ' (Deep Link)';
+    a.onclick = (e)=>{ /* let it attempt */ };
+    walletOptions.appendChild(a);
+  });
+
+  const disconnect = document.createElement('a');
+  disconnect.href = '#';
+  disconnect.textContent = 'Disconnect';
+  disconnect.onclick = async (e)=>{ e.preventDefault(); walletOptions.style.display='none'; await handleDisconnect(); };
+  walletOptions.appendChild(disconnect);
+}
+
+/* ====== EVENT HANDLERS ====== */
+async function handleDisconnect(){
+  try {
+    // try to disconnect politely if WalletConnect provider present
+    if(connectorType === 'walletconnect' && modalConnector && modalConnector.close) {
+      try { await modalConnector.close(); } catch(e){}
+    }
+    if(currentProvider && currentProvider.disconnect){
+      try{ await currentProvider.disconnect(); }catch(e){}
+    }
+  } catch(e){
+    console.warn('disconnect error', e);
+    showToast('Error while disconnecting: ' + (e.message||e));
+  } finally {
+    currentProvider = null;
+    ethersProvider = null;
+    signer = null;
+    userAddress = null;
+    connectorType = null;
+    clearState();
+    setDisconnectedUI();
+    showToast('Disconnected');
+  }
+}
+
+async function handleAccountsChanged(accounts){
+  try{
+    if(!accounts || accounts.length === 0){
+      // disconnected at wallet level
+      await handleDisconnect();
+      return;
+    }
+    userAddress = accounts[0];
+    setConnectedUI(userAddress);
+    saveState({ type: connectorType, ts: Date.now(), address: userAddress });
+    showToast('Account changed: ' + shortAddr(userAddress));
+  }catch(e){
+    console.error(e);
+  }
+}
+async function handleChainChanged(chainId){
+  try{
+    if(chainId !== CHAIN_ID_HEX && Number(chainId) !== CHAIN_ID){
+      showToast('Please switch to Polygon network (id 137)');
+    } else {
+      showToast('Network switched to Polygon');
+    }
+  }catch(e){ console.error(e); }
+}
+
+/* ====== ATTACH UI BEHAVIOR ====== */
+renderWalletOptions();
+connectFloating.addEventListener('click', async (e)=>{
+  const state = connectFloating.dataset.state;
+  // if connected -> disconnect
+  if(state === 'connected'){
+    await handleDisconnect();
+    return;
+  }
+  // toggle options
+  walletOptions.style.display = (walletOptions.style.display === 'block') ? 'none' : 'block';
+  connectFloating.setAttribute('aria-expanded', walletOptions.style.display === 'block' ? 'true' : 'false');
+});
+
+/* close wallet options clicking outside */
+document.addEventListener('click', (e)=>{
+  if(!e.target.closest('.top-right-connect')) walletOptions.style.display = 'none';
+});
+
+/* ====== AUTO-RECONNECT (persisted) ====== */
+async function tryAutoReconnect(){
+  const st = loadState();
+  if(!st || !st.type) return;
+  // prefer injected if type is injected and window.ethereum present
+  try{
+    if(st.type === 'injected' && window.ethereum){
+      await connectInjected();
+      return;
+    }
+    if(st.type === 'walletconnect'){
+      // try to re-open WalletConnect modal provider silently (some implementations allow connect with pairing)
+      try {
+        await connectWalletConnectModal();
+        return;
+      } catch(e){ console.warn('Auto WC reconnect failed', e); }
+    }
+  }catch(e){
+    console.warn('Auto reconnect failed', e);
+  }
+}
+
+/* run auto reconnect on page load */
+window.addEventListener('load', ()=>{ 
+  // load previously saved state; try to reconnect
+  tryAutoReconnect().catch(e=>{ console.warn('reconnect error', e); });
+  const st = loadState();
+  if(st && st.type && st.address){
+    setConnectedUI(st.address);
+  } else {
+    setDisconnectedUI();
+  }
+});
+
+/* ensure disconnect on unload (to clear ephemeral providers) */
+window.addEventListener('beforeunload', async ()=>{
+  // do not auto-disconnect persistent connections, only cleanup listeners if needed
+});
+
+/* ====== Safety wrappers for user interactions ====== */
+async function safeExec(fn, onErrorMsg){
+  try{
+    return await fn();
+  }catch(e){
+    console.error(onErrorMsg, e);
+    showToast(onErrorMsg + ': ' + (e.message||e));
+    throw e;
+  }
+}
+
+/* ====== Export small API for dev/testing (console) ====== */
+window.NOLA_WALLET = {
+  connectInjected,
+  connectWalletConnectModal,
+  disconnect: handleDisconnect,
+  getAddress: ()=> userAddress,
+  getProvider: ()=> currentProvider,
+  getEthersProvider: ()=> ethersProvider
+};
+</script>
+
+<!-- Existing chat + supabase logic (unchanged) -->
+<script>
+/* ====== CONFIG ====== */
+const SUPABASE_URL = "https://qnpeauoskuipzcoaqbpy.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFucGVhdW9za3VpcHpjb2FxYnB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0MDU2MjksImV4cCI6MjA3OTk4MTYyOX0.zduOSQAt7FALN[...]";
+
+/* ====== INIT CLIENT ====== */
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ====== ELEMENTS ====== */
+const chatSidebar = document.getElementById("chatSidebar");
+const chatToggle   = document.getElementById("chatToggle");
+const chatMessages = document.getElementById("chatMessages");
+const chatInput    = document.getElementById("chatInput");
+const sendChatBtn  = document.getElementById("sendChat");
+
+const usernameModal = document.getElementById("usernameModal");
+const modalUsername = document.getElementById("modalUsername");
+const confirmUsername = document.getElementById("confirmUsername");
+
+/* ====== STATE ====== */
+let chatUser = localStorage.getItem("chatUser") || null;
+let renderedIds = new Set(); 
+let lastId = 0; // track highest id rendered
+
+/* ====== UI: show modal if username missing ====== */
+if(!chatUser){
+  usernameModal.style.display = "flex";
+} else if(modalUsername) {
+  modalUsername.value = chatUser;
+}
+
+/* ====== username logic ====== */
+confirmUsername && (confirmUsername.onclick = async () => {
+  const v = (modalUsername.value || '').trim();
+  chatUser = v || ('User' + Math.floor(Math.random()*9999));
+  localStorage.setItem('chatUser', chatUser);
+  usernameModal.style.display = 'none';
+  await initChat();
+});
+
+/* if username already exists */
+if(chatUser){
+  initChat();
+}
+
+/* ====== Help: color only usernames ====== */
+const userColors = {};
+function getColor(name){
+  if(userColors[name]) return userColors[name];
+  const r = Math.floor(100 + Math.random()*120);
+  const g = Math.floor(50 + Math.random()*140);
+  const b = Math.floor(100 + Math.random()*120);
+  const col = `rgb(${r},${g},${b})`;
+  userColors[name] = col;
+  return col;
+}
+
+/* ====== Render message safely ====== */
+function escapeHtml(s){
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+
+function renderMessage(msg){
+  if(!msg || !msg.id) return;
+  if(renderedIds.has(String(msg.id))) return; 
+  renderedIds.add(String(msg.id));
+
+  const numericId = Number(msg.id);
+  if(!Number.isNaN(numericId) && numericId > lastId) lastId = numericId;
+
+  const el = document.createElement('div');
+  el.className = 'chat-msg';
+
+  const userEsc = escapeHtml(msg.user || 'Anon');
+  const textEsc = escapeHtml(msg.text || '');
+  const time = msg.created_at ? new Date(msg.created_at).toLocaleTimeString() : '';
+
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <b style="color:${getColor(userEsc)};font-weight:800">${userEsc}</b>
+      <span style="font-size:11px;color:rgba(255,255,255,0.5);margin-left:auto">${time}</span>
+    </div>
+    <div style="margin-top:6px;white-space:pre-wrap">${textEsc}</div>
+  `;
+
+  chatMessages.appendChild(el);
+
+  while(chatMessages.children.length > 500){
+    chatMessages.removeChild(chatMessages.firstChild);
+  }
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function showPlaceholder(){
+  chatMessages.innerHTML = `<div style="opacity:0.7;text-align:center;margin-top:20px">No messages yet — be first!</div>`;
+}
+
+/* ====== Load history ====== */
+async function loadHistory(){
+  try{
+    const { data, error } = await supabase
+      .from('chat_messages')
+      .select('id, user, text, created_at')
+      .order('id', { ascending: true })
+      .limit(200);
+
+    if(error){
+      console.error('History load error', error);
+      chatMessages.innerHTML = `<div style="color:#f88;text-align:center">Failed to load chat history</div>`;
+      return;
+    }
+
+    renderedIds.clear();
+    chatMessages.innerHTML = '';
+    if(!data || !data.length){
+      showPlaceholder();
+      lastId = 0;
+      return;
+    }
+
+    data.forEach(renderMessage);
+  }catch(err){
+    console.error('loadHistory exception', err);
+    chatMessages.innerHTML = `<div style="color:#f88;text-align:center">Chat unavailable</div>`;
+  }
+}
+
+/* ====== Polling: fetch new messages every 1.5s ====== */
+async function fetchNewMessages() {
+    try {
+        const { data, error } = await supabase
+            .from('chat_messages')
+            .select('id, user, text, created_at')
+            .gt('id', lastId)
+            .order('id', { ascending: true });
+
+        if(error){
+            console.error('Fetch new messages error:', error);
+            return;
+        }
+
+        if(data && data.length){
+            data.forEach(renderMessage);
+        }
+    } catch (e) {
+        console.error('fetchNewMessages exception:', e);
+    }
+}
+setInterval(fetchNewMessages, 600);
+
+/* ====== Send message ====== */
+/* ====== Send message (robust: always clears and focuses) ====== */
+let sending = false;
+sendChatBtn.addEventListener('click', async () => {
+  const text = (chatInput.value || '').trim();
+  if (!text) { chatInput.focus(); return; }
+  if (!chatUser) {
+    usernameModal.style.display = 'flex';
+    return;
+  }
+  if (sending) return;
+  sending = true;
+  sendChatBtn.disabled = true;
+
+  try {
+    const { data, error } = await supabase
+      .from('chat_messages')
+      .insert({ user: chatUser, text });
+
+    if (error) {
+      console.error('Insert error', error);
+      showToast('Send failed. Check console.', { type: 'error' });
+    } else if (data && data[0]) {
+      // local echo
+      renderMessage(data[0]);
+    }
+    // Clear and focus regardless of success so user can continue typing
+    chatInput.value = '';
+    chatInput.focus();
+  } catch (e) {
+    console.error('Send exception', e);
+    showToast('Send failed', { type: 'error' });
+    // still clear the input so the user can retry
+    chatInput.value = '';
+    chatInput.focus();
+  } finally {
+    sending = false;
+    sendChatBtn.disabled = false;
+  }
+});
+
+/* ====== Send on Enter ====== */
+chatInput.addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    sendChatBtn.click();
+  }
+});
+
+/* ====== Toggle chat sidebar ====== */
+chatToggle && chatToggle.addEventListener('click', () => {
+  chatSidebar.classList.toggle('open');
+});
+
+/* ====== Open chat when user taps main area (per your request) ====== */
+document.querySelectorAll('.section-wrapper, .container').forEach(el=>{
+  el.addEventListener('click', (e) => {
+    // if click was inside suggestions or inputs, don't auto-open
+    const insideSuggestion = !!e.target.closest('.suggestions');
+    const insideInput = !!e.target.closest('input, button, .glassy-btn, .quick-cta');
+    if (insideSuggestion || insideInput) return;
+    chatSidebar.classList.remove('open');
+  });
+});
+
+/* ====== Init chat ====== */ 
+async function initChat(){
+  await loadHistory();
+}
+</script>
+
+</body>
+</html>
