@@ -9,9 +9,8 @@ import EthereumProvider from '@walletconnect/ethereum-provider';
  */
 const POLYGON_CHAIN_ID_HEX = '0x89'; // Polygon mainnet
 const POLYGON_CHAIN_ID_DEC = 137;
-const POLYGON_RPC = 'https://polygon-rpc.com/'; // <-- REPLACE with your Polygon RPC URL
-const WALLETCONNECT_PROJECT_ID = 'YOUR_WALLETCONNECT_PROJECT_ID'; // <-- REPLACE with WalletConnect v2 project id
-
+const POLYGON_RPC = "https://polygon-mainnet.g.alchemy.com/v2/8ikEzpLeLerL-8xNW23fVUser"; // <-- REPLACE with your Polygon RPC (placeholder)
+    const WALLETCONNECT_PROJECT_ID = '6557a92e369812727669d41cbeb95a1'; // <-- placeholder if you later use WCv2
 // Elements
 const mainButton = document.getElementById('main-button');
 const mainBtnText = document.getElementById('main-btn-text');
