@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Connect Wallet — Polygon (Purple Theme)</title>
+  <script type="module" crossorigin src="/Nol/assets/index-CeAqENKG.js"></script>
+  <link rel="stylesheet" crossorigin href="/Nol/assets/index-Dr_QztVA.css">
+</head>
+<body>
+  <div class="container">
+    <button id="main-button" class="connect-btn" aria-live="polite">
+      <span class="dot" aria-hidden="true"></span>
+      <span id="main-btn-text">Connect Wallet</span>
+    </button>
+  </div>
+
+  <!-- Chip modal -->
+  <div id="chip-modal" class="chip-modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="chip-sheet" role="document" aria-label="Connect wallet">
+      <div class="sheet-header">
+        <div>
+          <div class="sheet-title">Connect wallet</div>
+          <div class="sheet-sub">Choose a wallet to connect to Polygon (Mainnet)</div>
+        </div>
+        <div class="close-x" id="close-modal" title="Close">✕</div>
+      </div>
+
+      <div class="wallet-list">
+        <div class="wallet-chip" id="metamask-chip" title="MetaMask (injected)">
+          <div class="wallet-left">
+            <div class="wallet-icon">MM</div>
+            <div class="wallet-meta">
+              <div class="wallet-name">MetaMask</div>
+              <div class="wallet-desc">Browser extension or MetaMask Mobile (deep link).</div>
+            </div>
+          </div>
+          <div class="wallet-action"><div style="font-size:13px;color:#dcd0ff">Injected</div></div>
+        </div>
+
+        <div class="wallet-chip" id="walletconnect-chip" title="WalletConnect (v2)">
+          <div class="wallet-left">
+            <div class="wallet-icon">WC</div>
+            <div class="wallet-meta">
+              <div class="wallet-name">WalletConnect</div>
+              <div class="wallet-desc">Scan QR or open a compatible mobile wallet (v2).</div>
+            </div>
+          </div>
+          <div class="wallet-action"><div style="font-size:13px;color:#dcd0ff">QR / Deep Link</div></div>
+        </div>
+
+        <div class="wallet-chip" id="binance-chip" title="Binance Chain Wallet">
+          <div class="wallet-left">
+            <div class="wallet-icon">BN</div>
+            <div class="wallet-meta">
+              <div class="wallet-name">Binance Wallet</div>
+              <div class="wallet-desc">Binance Chain Wallet extension or Binance mobile app.</div>
+            </div>
+          </div>
+          <div class="wallet-action"><div style="font-size:13px;color:#dcd0ff">Injected</div></div>
+        </div>
+      </div>
+
+      <div id="modal-status" style="margin-top:14px;color:#f6e9ff;font-size:13px;display:none"></div>
+    </div>
+  </div>
+
+</body>
+</html>
