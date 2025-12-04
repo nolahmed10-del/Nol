@@ -3,19 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Connect Wallet — Polygon (Purple Theme) — WalletConnect v2 Only</title>
+  <title>Connect Wallet — Polygon (Purple Theme) — Robust WCv2 Loader</title>
 
-  <!-- Ethers.js (v5 UMD) -->
+  <!-- Ethers.js (v5 UMD) - kept as UMD for maximum compatibility -->
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-
-  <!-- WalletConnect v2 Ethereum Provider (UMD build) -->
-  <!-- This exact CDN URL is known to publish the UMD bundle for @walletconnect/ethereum-provider.
-       If your environment blocks this CDN, download the package and bundle it locally. -->
-  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.6.0/dist/umd/index.min.js"></script>
 
   <style>
     :root{
-      --purple-900: #25042f;
       --purple-700: #5a0fa8;
       --purple-500: #7b2bff;
       --purple-300: #b595ff;
@@ -45,6 +39,7 @@
     .balance{font-size:13px;color:#ffd6ff;opacity:0.95;background:rgba(255,255,255,0.02);padding:6px 8px;border-radius:8px;font-weight:700;}
     .close-x{width:36px;height:36px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.02);cursor:pointer;}
     .status{margin-top:14px;color:#f6e9ff;font-size:13px;display:none;}
+    footer{position:fixed;left:12px;bottom:12px;color:#c9bff8;font-size:12px;opacity:0.7}
   </style>
 </head>
 <body>
@@ -60,7 +55,7 @@
       <div class="sheet-header">
         <div>
           <div class="sheet-title">Connect wallet</div>
-          <div class="sheet-sub">Choose a wallet to connect to Polygon (Mainnet). WalletConnect v2 is used for best mobile support.</div>
+          <div class="sheet-sub">Choose a wallet to connect to Polygon (Mainnet). WalletConnect v2 is used for mobile deep links and broad support.</div>
         </div>
         <div class="close-x" id="close-modal" title="Close">✕</div>
       </div>
@@ -71,7 +66,7 @@
             <div class="wallet-icon">MM</div>
             <div class="wallet-meta">
               <div class="wallet-name">Injected Wallet</div>
-              <div class="wallet-desc">MetaMask, Binance Wallet, etc. (browser extension / app)</div>
+              <div class="wallet-desc">MetaMask, Binance Chain Wallet (extension or mobile).</div>
             </div>
           </div>
           <div class="wallet-action"><div style="font-size:13px;color:#dcd0ff">Injected</div></div>
@@ -82,7 +77,7 @@
             <div class="wallet-icon">WC</div>
             <div class="wallet-meta">
               <div class="wallet-name">WalletConnect</div>
-              <div class="wallet-desc">Open QR or deep link many mobile wallets (v2).</div>
+              <div class="wallet-desc">Opens QR or deep link for many mobile wallets (WalletConnect v2).</div>
             </div>
           </div>
           <div class="wallet-action"><div style="font-size:13px;color:#dcd0ff">QR / Deep Link</div></div>
@@ -93,49 +88,41 @@
     </div>
   </div>
 
-  <script>
-    /************************************************************************
-     * IMPORTANT — CONFIGURATION
-     *
-     * Replace the placeholders below with your actual production values:
-     * - POLYGON_RPC: a reliable Polygon RPC (Alchemy/QuickNode/Infura or your node)
-     *   Example: "https://polygon-mainnet.g.alchemy.com/v2/YOUR_ALCHEMY_KEY"
-     *
-     * - WALLETCONNECT_PROJECT_ID: WalletConnect v2 Project ID from cloud.walletconnect.com
-     *
-     **************************************************************************/
+  <footer id="diag-footer" aria-hidden="true">Diagnostics: idle</footer>
+
+  <!-- Main logic as an ES module to allow robust dynamic imports and fallbacks -->
+  <script type="module">
+    // CONFIG - replace placeholders before deploying
     const POLYGON_CHAIN_ID_HEX = '0x89';
     const POLYGON_CHAIN_ID_DEC = 137;
-       const POLYGON_RPC = "https://polygon-mainnet.g.alchemy.com/v2/8ikEzpLeLerL-8xNW23fVUser"; // <-- REPLACE with your Polygon RPC (placeholder)
-    const WALLETCONNECT_PROJECT_ID = '6557a92e369812727669d41cbeb95a1'; // <-- placeholder if you later use WCv2
+    const WALLETCONNECT_PROJECT_ID = '6557a92e369812727669d41cbeb95a1'; 
+  const POLYGON_RPC = "https://polygon-mainnet.g.alchemy.com/v2/8ikEzpLeLerL-8xNW23fVUser"; // <-- REPLACE with your Polygon RPC (placeholder)   const WALLETCONNECT_PROJECT_ID = 'YOUR_WALLETCONNECT_PROJECT_ID'; // <-- REPLACE with your WalletConnect v2 Project ID
 
-    // UI elements
+    // Elements
     const mainButton = document.getElementById('main-button');
-    const mainBtnText = document.getElementById('main-btn-text');
     const chipModal = document.getElementById('chip-modal');
     const closeModalBtn = document.getElementById('close-modal');
-    const statusEl = document.getElementById('modal-status');
-
     const injectedChip = document.getElementById('injected-chip');
     const walletconnectChip = document.getElementById('walletconnect-chip');
+    const statusEl = document.getElementById('modal-status');
+    const diagFooter = document.getElementById('diag-footer');
 
     // State
     let provider = null;       // ethers provider
-    let rawProvider = null;    // underlying provider (window.ethereum or WC provider)
+    let rawProvider = null;    // underlying EIP-1193 provider (WCv2 or injected)
     let signer = null;
     let connectedAddress = null;
     let connectedBalance = null;
     let connectedWalletType = null;
 
-    // Utilities
-    function shorten(addr){ if(!addr) return ''; return addr.slice(0,6) + '…' + addr.slice(-4); }
-    function formatBalance(wei){ try{ const eth = ethers.utils.formatEther(wei); const num = Number(eth); return (num >= 0.01) ? num.toFixed(4) : Number(eth).toString(); }catch(e){ return '0.0000'; } }
+    // Utility helpers
+    function shorten(s){ if(!s) return ''; return s.slice(0,6) + '…' + s.slice(-4); }
+    function formatBalance(wei){ try { const eth = window.ethers.utils.formatEther(wei); const num = Number(eth); return (num >= 0.01) ? num.toFixed(4) : Number(eth).toString(); } catch(e){ return '0.0000'; } }
+    function showStatus(msg){ statusEl.style.display = 'block'; statusEl.textContent = msg; diagFooter.textContent = msg; }
+    function hideStatus(){ statusEl.style.display = 'none'; statusEl.textContent = ''; diagFooter.textContent = 'idle'; }
 
     function openModal(){ chipModal.style.display = 'flex'; chipModal.setAttribute('aria-hidden','false'); }
     function closeModal(){ chipModal.style.display = 'none'; chipModal.setAttribute('aria-hidden','true'); hideStatus(); }
-
-    function showStatus(msg){ statusEl.style.display = 'block'; statusEl.textContent = msg; }
-    function hideStatus(){ statusEl.style.display = 'none'; statusEl.textContent = ''; }
 
     function refreshMainButton(){
       if(connectedAddress){
@@ -151,7 +138,6 @@
       }
     }
 
-    // Ensure chain is Polygon, try switch or add
     async function ensurePolygonChain(raw){
       try{
         const current = await raw.request({ method: 'eth_chainId' });
@@ -182,23 +168,7 @@
       }
     }
 
-    // Setup listeners for injected providers
-    function setupInjectedListeners(raw){
-      if(!raw || !raw.on) return;
-      raw.on('accountsChanged', (accounts) => {
-        if(!accounts || accounts.length === 0){ disconnect(); return; }
-        connectedAddress = ethers.utils.getAddress(accounts[0]);
-        provider.getBalance(connectedAddress).then(b => { connectedBalance = formatBalance(b); refreshMainButton(); }).catch(()=>refreshMainButton());
-      });
-      raw.on('chainChanged', (chainId) => {
-        if(chainId !== POLYGON_CHAIN_ID_HEX){
-          showStatus('Please switch back to Polygon network in your wallet.');
-        } else { hideStatus(); }
-      });
-      raw.on('disconnect', () => { disconnect(); });
-    }
-
-    // Connect injected wallet (MetaMask/Binance Mobile extension)
+    // Injected connect (MetaMask/Binance)
     async function connectInjected(){
       try{
         if(!window.ethereum){
@@ -209,11 +179,10 @@
         await ensurePolygonChain(rawProvider);
         const accounts = await rawProvider.request({ method: 'eth_requestAccounts' });
         if(!accounts || accounts.length === 0){ showStatus('No accounts returned.'); return; }
-        const account = ethers.utils.getAddress(accounts[0]);
-        provider = new ethers.providers.Web3Provider(rawProvider);
+        connectedAddress = window.ethers.utils.getAddress(accounts[0]);
+        provider = new window.ethers.providers.Web3Provider(rawProvider);
         signer = provider.getSigner();
-        connectedAddress = account;
-        const bal = await provider.getBalance(account);
+        const bal = await provider.getBalance(connectedAddress);
         connectedBalance = formatBalance(bal);
         connectedWalletType = 'injected';
         setupInjectedListeners(rawProvider);
@@ -221,96 +190,226 @@
         refreshMainButton();
       }catch(err){
         console.error('Injected connect error:', err);
-        showStatus('Connection failed: ' + (err?.message || err?.toString()));
+        showStatus('Injected connection failed: ' + (err?.message || err?.toString()));
       }
     }
 
-    // WalletConnect v2 — robust initialization and detection
-    async function connectWalletConnectV2(){
-      // Try to find the exposed UMD symbol for the walletconnect provider
-      // Different builds expose slightly different globals; check several fallbacks.
-      const maybeWC = window.WalletConnect?.EthereumProvider
-                    || window.WalletConnectEthereumProvider
-                    || window.WalletConnectProvider
-                    || window.EthereumProvider
-                    || (window.WalletConnect && window.WalletConnect.default)
-                    || (window.WalletConnectProvider && window.WalletConnectProvider.default)
-                    || null;
+    function setupInjectedListeners(raw){
+      if(!raw || !raw.on) return;
+      raw.on('accountsChanged', (accounts) => {
+        if(!accounts || accounts.length === 0){ disconnect(); return; }
+        connectedAddress = window.ethers.utils.getAddress(accounts[0]);
+        provider.getBalance(connectedAddress).then(b => { connectedBalance = formatBalance(b); refreshMainButton(); }).catch(()=>refreshMainButton());
+      });
+      raw.on('chainChanged', (chainId) => {
+        if(chainId !== POLYGON_CHAIN_ID_HEX) showStatus('Please switch your wallet back to Polygon network.');
+        else hideStatus();
+      });
+      raw.on('disconnect', () => { disconnect(); });
+    }
 
-      if(!maybeWC || typeof maybeWC.init !== 'function'){
-        showStatus('WalletConnect v2 library not loaded or UMD global name unexpected. Make sure the script tag for @walletconnect/ethereum-provider is present.');
-        console.error('WalletConnect UMD not found on window. Available globals:', Object.keys(window).filter(k => /walletconnect|WalletConnect|EthereumProvider|WalletConnectProvider/i.test(k)));
+    // Robust loader: try ESM import, then fallback to UMD script injection and global detection.
+    async function loadWalletConnectProviderClass(){
+      const esmUrl = 'https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.6.0/dist/esm/index.min.js';
+      const umdUrl = 'https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.6.0/dist/umd/index.min.js';
+      let ProviderClass = null;
+
+      // 1) Try dynamic ESM import (most reliable if CDN allows module import)
+      try{
+        const m = await import(esmUrl);
+        // ESM likely exports default as EthereumProvider class
+        ProviderClass = m.default || m.EthereumProvider || m.WalletConnectProvider || m;
+        if(ProviderClass) {
+          console.log('Loaded WalletConnect provider via ESM import.');
+          return ProviderClass;
+        }
+      }catch(e){
+        console.warn('ESM import of WalletConnect provider failed (this is OK in some CSP/CDN setups):', e);
+      }
+
+      // 2) Fallback: inject UMD script and wait for globals
+      try{
+        await new Promise((resolve, reject) => {
+          // Check if a global already exists
+          const globalCandidates = [
+            // Known possible global shapes:
+            'WalletConnect', 'WalletConnectEthereumProvider', 'WalletConnectProvider', 'EthereumProvider', 'walletConnect'
+          ];
+          for(const g of globalCandidates){
+            if(window[g]) { resolve(); return; }
+          }
+
+          const s = document.createElement('script');
+          s.src = umdUrl;
+          s.async = true;
+          s.onload = () => resolve();
+          s.onerror = (err) => reject(new Error('Failed to load UMD script: ' + umdUrl));
+          document.head.appendChild(s);
+        });
+
+        // After script load, inspect common global names
+        ProviderClass =
+          window.WalletConnect?.EthereumProvider ||
+          window.WalletConnectEthereumProvider ||
+          window.WalletConnectProvider ||
+          window.EthereumProvider ||
+          window.WalletConnect ||
+          window.walletConnect ||
+          null;
+
+        // Some builds expose default on WalletConnect.default
+        if(!ProviderClass && window.WalletConnect && window.WalletConnect.default) ProviderClass = window.WalletConnect.default;
+        if(!ProviderClass && window.WalletConnectProvider && window.WalletConnectProvider.default) ProviderClass = window.WalletConnectProvider.default;
+
+        if(ProviderClass && typeof ProviderClass.init === 'function'){
+          console.log('Loaded WalletConnect provider via UMD globals.');
+          return ProviderClass;
+        }
+
+        // If ProviderClass is constructor function/class rather than container with init,
+        // some UMD expose a class directly (not an object with init). We'll try to use it directly below.
+        if(ProviderClass && (typeof ProviderClass === 'function' || typeof ProviderClass === 'object')){
+          console.log('Detected WalletConnect provider global object/class, will attempt to use it.');
+          return ProviderClass;
+        }
+
+        // Not found or unexpected structure
+        console.warn('WalletConnect UMD loaded but expected globals not found. Available window keys that match walletconnect:', Object.keys(window).filter(k => /walletconnect|WalletConnect|EthereumProvider|WalletConnectProvider/i.test(k)));
+        return null;
+      }catch(err){
+        console.error('Failed to load WalletConnect provider UMD:', err);
+        return null;
+      }
+    }
+
+    // Connect using WalletConnect v2 through the provider class obtained above.
+    async function connectWalletConnectV2(){
+      hideStatus();
+      showStatus('Preparing WalletConnect v2...');
+
+      const WCProviderClass = await loadWalletConnectProviderClass();
+      if(!WCProviderClass){
+        showStatus('WalletConnect v2 library not found. Ensure the page can access the CDN or bundle the library locally.');
         return;
       }
 
       if(!WALLETCONNECT_PROJECT_ID || WALLETCONNECT_PROJECT_ID === 'YOUR_WALLETCONNECT_PROJECT_ID'){
-        showStatus('Please set a valid WalletConnect v2 Project ID in the WALLETCONNECT_PROJECT_ID variable.');
+        showStatus('Please set WALLETCONNECT_PROJECT_ID in the configuration.');
         return;
       }
 
-      showStatus('Opening WalletConnect v2 modal...');
-
       try{
-        // Initialize the provider using the UMD's init function
-        // This returns a provider instance that implements the EIP-1193 methods
-        rawProvider = await maybeWC.init({
-          projectId: WALLETCONNECT_PROJECT_ID,
-          chains: [POLYGON_CHAIN_ID_DEC],
-          showQrModal: true,
-          rpcMap: { [POLYGON_CHAIN_ID_DEC]: POLYGON_RPC },
-          metadata: {
-            name: 'Your Project Name',
-            description: 'Connect to Polygon via WalletConnect v2',
-            url: window.location.origin,
-            icons: []
-          }
-        });
+        // Different builds may give either:
+        // - an object with an init(...) factory function, or
+        // - a class/constructor where you call new WCProviderClass({...})
+        // We'll handle both shapes.
+        let instance = null;
 
-        // After init(), we should request accounts
-        // Some versions require enable() or request; request('eth_requestAccounts') is safest
+        if(typeof WCProviderClass.init === 'function'){
+          // Factory style (common): call init to get provider
+          instance = await WCProviderClass.init({
+            projectId: WALLETCONNECT_PROJECT_ID,
+            chains: [POLYGON_CHAIN_ID_DEC],
+            showQrModal: true,
+            rpcMap: { [POLYGON_CHAIN_ID_DEC]: POLYGON_RPC },
+            metadata: {
+              name: document.title || 'My App',
+              description: 'Connect to Polygon via WalletConnect v2',
+              url: window.location.origin,
+              icons: []
+            }
+          });
+        } else if(typeof WCProviderClass === 'function'){
+          // Class-style constructor (some globals expose a class directly)
+          // Try constructing an instance — library may expect different param names so we try common ones.
+          try{
+            instance = new WCProviderClass({
+              projectId: WALLETCONNECT_PROJECT_ID,
+              chains: [POLYGON_CHAIN_ID_DEC],
+              showQrModal: true,
+              rpcMap: { [POLYGON_CHAIN_ID_DEC]: POLYGON_RPC },
+              metadata: {
+                name: document.title || 'My App',
+                description: 'Connect to Polygon via WalletConnect v2',
+                url: window.location.origin,
+                icons: []
+              }
+            });
+            // Some class builds require calling .init() or .enable()
+            if(typeof instance.init === 'function') await instance.init();
+          }catch(innerErr){
+            console.warn('Constructor path failed, trying init() on provided object if available.', innerErr);
+            if(typeof WCProviderClass.init === 'function'){
+              instance = await WCProviderClass.init({
+                projectId: WALLETCONNECT_PROJECT_ID,
+                chains: [POLYGON_CHAIN_ID_DEC],
+                showQrModal: true,
+                rpcMap: { [POLYGON_CHAIN_ID_DEC]: POLYGON_RPC },
+                metadata: {
+                  name: document.title || 'My App',
+                  description: 'Connect to Polygon via WalletConnect v2',
+                  url: window.location.origin,
+                  icons: []
+                }
+              });
+            } else {
+              throw innerErr;
+            }
+          }
+        } else {
+          showStatus('Unexpected WalletConnect provider shape. Check console for diagnostics.');
+          console.error('Unexpected ProviderClass shape:', WCProviderClass);
+          return;
+        }
+
+        if(!instance){
+          showStatus('Could not initialize WalletConnect provider instance.');
+          return;
+        }
+
+        rawProvider = instance;
+
+        // Request accounts (this will open QR modal on desktop / deep link on mobile)
         await rawProvider.request({ method: 'eth_requestAccounts' });
 
-        provider = new ethers.providers.Web3Provider(rawProvider);
+        provider = new window.ethers.providers.Web3Provider(rawProvider);
         signer = provider.getSigner();
         const accounts = await provider.listAccounts();
         if(!accounts || accounts.length === 0){
           showStatus('No accounts returned from WalletConnect.');
           return;
         }
-
-        connectedAddress = ethers.utils.getAddress(accounts[0]);
+        connectedAddress = window.ethers.utils.getAddress(accounts[0]);
         const bal = await provider.getBalance(connectedAddress);
         connectedBalance = formatBalance(bal);
         connectedWalletType = 'walletconnect_v2';
 
-        // wire events
+        // Wire events
         if(rawProvider.on){
-          rawProvider.on('disconnect', () => { disconnect(); });
+          rawProvider.on('disconnect', () => disconnect());
           rawProvider.on('accountsChanged', (accounts) => {
             if(!accounts || accounts.length === 0){ disconnect(); return; }
-            connectedAddress = ethers.utils.getAddress(accounts[0]);
+            connectedAddress = window.ethers.utils.getAddress(accounts[0]);
             provider.getBalance(connectedAddress).then(b => { connectedBalance = formatBalance(b); refreshMainButton(); }).catch(()=>refreshMainButton());
           });
           rawProvider.on('chainChanged', (chainId) => {
-            if(chainId !== POLYGON_CHAIN_ID_HEX){
-              showStatus('Please switch back to Polygon network in your wallet.');
-            } else { hideStatus(); }
+            if(chainId !== POLYGON_CHAIN_ID_HEX) showStatus('Please switch your wallet back to Polygon network.');
+            else hideStatus();
           });
         }
 
         closeModal();
         refreshMainButton();
       }catch(err){
-        console.error('WalletConnect v2 error:', err);
-        showStatus('WalletConnect failed: ' + (err?.message || err?.toString()));
+        console.error('WalletConnect v2 connect error:', err);
+        showStatus('WalletConnect connection failed: ' + (err?.message || err?.toString()));
       }
     }
 
-    // Cleanly disconnect and cleanup sessions (WalletConnect supports disconnect())
     async function disconnect(){
       try{
         if(rawProvider && typeof rawProvider.disconnect === 'function'){
-          try{ await rawProvider.disconnect(); }catch(e){ /* ignore errors */ }
+          try{ await rawProvider.disconnect(); }catch(e){ /* ignore */ }
         }
       }catch(e){}
       provider = null;
@@ -324,35 +423,25 @@
     }
 
     // Event wiring
-    mainButton.addEventListener('click', (e) => {
+    mainButton.addEventListener('click', () => {
       if(connectedAddress){ disconnect(); return; }
       openModal();
     });
     closeModalBtn.addEventListener('click', closeModal);
     chipModal.addEventListener('click', (e) => { if(e.target === chipModal) closeModal(); });
-
-    injectedChip.addEventListener('click', async () => {
-      showStatus('Connecting to injected wallet...');
-      await connectInjected();
-    });
-
-    walletconnectChip.addEventListener('click', async () => {
-      await connectWalletConnectV2();
-    });
+    injectedChip.addEventListener('click', async () => { showStatus('Connecting injected wallet...'); await connectInjected(); });
+    walletconnectChip.addEventListener('click', async () => { await connectWalletConnectV2(); });
 
     document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeModal(); });
 
-    // Initialize
+    // Initial UI
     refreshMainButton();
 
-    // Helpful developer diagnostics (runs once)
+    // Diagnostics to help you debug quickly (prints available globals matching walletconnect)
     (function diagnostics(){
-      // Log whether walletconnect script loaded and what globals exist
-      const hasWC = !!(window.WalletConnect?.EthereumProvider || window.WalletConnectEthereumProvider || window.WalletConnectProvider || window.EthereumProvider);
-      console.log('Diagnostics: WalletConnect v2 UMD detected:', hasWC);
-      if(!hasWC){
-        console.warn('WalletConnect v2 UMD not detected. If you see "library not loaded" errors, check the script tag and network access to cdn.jsdelivr.net.');
-      }
+      const keys = Object.keys(window).filter(k => /walletconnect|WalletConnect|EthereumProvider|WalletConnectProvider|walletConnect/i.test(k));
+      console.log('Diagnostics: walletconnect-like globals on window:', keys);
+      diagFooter.textContent = 'Diagnostics: found globals: ' + (keys.length ? keys.join(', ') : '(none)');
     })();
   </script>
 </body>
