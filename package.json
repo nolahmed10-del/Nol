@@ -1,0 +1,18 @@
+{
+  "name": "polygon-walletconnect-local-bundle",
+  "version": "1.0.0",
+  "description": "Minimal Vite project bundling WalletConnect v2 provider and ethers locally for Polygon",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@walletconnect/ethereum-provider": "^2.11.0",
+    "ethers": "^6.8.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.8"
+  }
+}
