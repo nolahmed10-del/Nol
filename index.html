@@ -3,44 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Connect Wallet — Polygon (Purple Theme) — Robust WCv2 Loader</title>
-
-  <!-- Ethers.js (v5 UMD) - kept as UMD for maximum compatibility -->
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-
-  <style>
-    :root{
-      --purple-700: #5a0fa8;
-      --purple-500: #7b2bff;
-      --purple-300: #b595ff;
-      --bg: #0f0813;
-    }
-    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;background:linear-gradient(180deg,#0b0710 0%, #12061a 60%);color:#fff;display:flex;align-items:center;justify-content:center;}
-    .container{width:100%;max-width:860px;padding:48px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;}
-    .connect-btn{background:linear-gradient(90deg,var(--purple-700),var(--purple-500));border:none;color:white;padding:14px 22px;border-radius:12px;box-shadow:0 8px 30px rgba(123,43,255,0.16), inset 0 -2px 0 rgba(0,0,0,0.15);font-weight:600;font-size:16px;cursor:pointer;display:flex;gap:12px;align-items:center;transition:transform .12s ease,box-shadow .12s ease;}
-    .connect-btn:hover{transform:translateY(-3px);}
-    .dot{width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#fff9,rgba(255,255,255,0.06) 30%),#fff;box-shadow:0 2px 8px rgba(123,43,255,0.28);}
-    .chip-modal{position:fixed;left:0;right:0;top:0;bottom:0;display:none;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(11,7,16,0.6),rgba(11,7,16,0.8));z-index:9999;backdrop-filter:blur(8px) saturate(120%);padding:24px;box-sizing:border-box;}
-    .chip-sheet{width:100%;max-width:640px;background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.02));border-radius:16px;padding:20px;box-shadow:0 10px 40px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.04);box-sizing:border-box;}
-    .sheet-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;}
-    .sheet-title{font-size:18px;font-weight:700;color:var(--purple-300);display:flex;align-items:center;gap:12px;}
-    .sheet-sub{font-size:13px;color:#cfc7ee;opacity:0.95;}
-    .wallet-list{display:flex;flex-direction:column;gap:12px;margin-top:6px;}
-    .wallet-chip{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:12px;background:linear-gradient(135deg, rgba(123,43,255,0.08), rgba(90,15,168,0.02));border:1px solid rgba(123,43,255,0.06);cursor:pointer;transition:transform .12s ease,box-shadow .12s ease;}
-    .wallet-chip:hover{transform:translateY(-4px);box-shadow:0 14px 40px rgba(90,15,168,0.12);}
-    .wallet-left{display:flex;align-items:center;gap:12px;}
-    .wallet-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg, rgba(123,43,255,0.22), rgba(90,15,168,0.12));border:1px solid rgba(255,255,255,0.03);font-weight:700;color:white;font-size:16px;flex:0 0 44px;}
-    .wallet-meta{display:flex;flex-direction:column;}
-    .wallet-name{font-weight:700;color:#fff;font-size:15px;}
-    .wallet-desc{font-size:12px;color:#d7cfff;opacity:0.95;margin-top:4px;}
-    .wallet-action{display:flex;align-items:center;gap:10px;}
-    .connected-chip{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:999px;background:linear-gradient(90deg,rgba(123,43,255,0.14),rgba(90,15,168,0.06));border:1px solid rgba(123,43,255,0.14);color:#fff;font-weight:600;cursor:pointer;box-shadow:0 8px 30px rgba(123,43,255,0.06);}
-    .address{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,"Roboto Mono",monospace;font-size:13px;color:#fff;opacity:0.95;}
-    .balance{font-size:13px;color:#ffd6ff;opacity:0.95;background:rgba(255,255,255,0.02);padding:6px 8px;border-radius:8px;font-weight:700;}
-    .close-x{width:36px;height:36px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.02);cursor:pointer;}
-    .status{margin-top:14px;color:#f6e9ff;font-size:13px;display:none;}
-    footer{position:fixed;left:12px;bottom:12px;color:#c9bff8;font-size:12px;opacity:0.7}
-  </style>
+  <title>Connect Wallet — Polygon (Purple Theme)</title>
+  <link rel="stylesheet" href="/src/styles.css" />
 </head>
 <body>
   <div class="container">
@@ -50,399 +14,56 @@
     </button>
   </div>
 
+  <!-- Chip modal -->
   <div id="chip-modal" class="chip-modal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="chip-sheet" role="document" aria-label="Connect wallet">
       <div class="sheet-header">
         <div>
           <div class="sheet-title">Connect wallet</div>
-          <div class="sheet-sub">Choose a wallet to connect to Polygon (Mainnet). WalletConnect v2 is used for mobile deep links and broad support.</div>
+          <div class="sheet-sub">Choose a wallet to connect to Polygon (Mainnet)</div>
         </div>
         <div class="close-x" id="close-modal" title="Close">✕</div>
       </div>
 
       <div class="wallet-list">
-        <div class="wallet-chip" id="injected-chip" title="Injected wallets (MetaMask, Binance)">
+        <div class="wallet-chip" id="metamask-chip" title="MetaMask (injected)">
           <div class="wallet-left">
             <div class="wallet-icon">MM</div>
             <div class="wallet-meta">
-              <div class="wallet-name">Injected Wallet</div>
-              <div class="wallet-desc">MetaMask, Binance Chain Wallet (extension or mobile).</div>
+              <div class="wallet-name">MetaMask</div>
+              <div class="wallet-desc">Browser extension or MetaMask Mobile (deep link).</div>
             </div>
           </div>
           <div class="wallet-action"><div style="font-size:13px;color:#dcd0ff">Injected</div></div>
         </div>
 
-        <div class="wallet-chip" id="walletconnect-chip" title="WalletConnect v2 (recommended)">
+        <div class="wallet-chip" id="walletconnect-chip" title="WalletConnect (v2)">
           <div class="wallet-left">
             <div class="wallet-icon">WC</div>
             <div class="wallet-meta">
               <div class="wallet-name">WalletConnect</div>
-              <div class="wallet-desc">Opens QR or deep link for many mobile wallets (WalletConnect v2).</div>
+              <div class="wallet-desc">Scan QR or open a compatible mobile wallet (v2).</div>
             </div>
           </div>
           <div class="wallet-action"><div style="font-size:13px;color:#dcd0ff">QR / Deep Link</div></div>
         </div>
+
+        <div class="wallet-chip" id="binance-chip" title="Binance Chain Wallet">
+          <div class="wallet-left">
+            <div class="wallet-icon">BN</div>
+            <div class="wallet-meta">
+              <div class="wallet-name">Binance Wallet</div>
+              <div class="wallet-desc">Binance Chain Wallet extension or Binance mobile app.</div>
+            </div>
+          </div>
+          <div class="wallet-action"><div style="font-size:13px;color:#dcd0ff">Injected</div></div>
+        </div>
       </div>
 
-      <div id="modal-status" class="status" role="status" aria-live="polite"></div>
+      <div id="modal-status" style="margin-top:14px;color:#f6e9ff;font-size:13px;display:none"></div>
     </div>
   </div>
 
-  <footer id="diag-footer" aria-hidden="true">Diagnostics: idle</footer>
-
-  <!-- Main logic as an ES module to allow robust dynamic imports and fallbacks -->
-  <script type="module">
-    // CONFIG - replace placeholders before deploying
-    const POLYGON_CHAIN_ID_HEX = '0x89';
-    const POLYGON_CHAIN_ID_DEC = 137;
-    const WALLETCONNECT_PROJECT_ID = '6557a92e369812727669d41cbeb95a1'; 
-  const POLYGON_RPC = "https://polygon-mainnet.g.alchemy.com/v2/8ikEzpLeLerL-8xNW23fVUser"; // <-- REPLACE with your Polygon RPC (placeholder)   const WALLETCONNECT_PROJECT_ID = 'YOUR_WALLETCONNECT_PROJECT_ID'; // <-- REPLACE with your WalletConnect v2 Project ID
-
-    // Elements
-    const mainButton = document.getElementById('main-button');
-    const chipModal = document.getElementById('chip-modal');
-    const closeModalBtn = document.getElementById('close-modal');
-    const injectedChip = document.getElementById('injected-chip');
-    const walletconnectChip = document.getElementById('walletconnect-chip');
-    const statusEl = document.getElementById('modal-status');
-    const diagFooter = document.getElementById('diag-footer');
-
-    // State
-    let provider = null;       // ethers provider
-    let rawProvider = null;    // underlying EIP-1193 provider (WCv2 or injected)
-    let signer = null;
-    let connectedAddress = null;
-    let connectedBalance = null;
-    let connectedWalletType = null;
-
-    // Utility helpers
-    function shorten(s){ if(!s) return ''; return s.slice(0,6) + '…' + s.slice(-4); }
-    function formatBalance(wei){ try { const eth = window.ethers.utils.formatEther(wei); const num = Number(eth); return (num >= 0.01) ? num.toFixed(4) : Number(eth).toString(); } catch(e){ return '0.0000'; } }
-    function showStatus(msg){ statusEl.style.display = 'block'; statusEl.textContent = msg; diagFooter.textContent = msg; }
-    function hideStatus(){ statusEl.style.display = 'none'; statusEl.textContent = ''; diagFooter.textContent = 'idle'; }
-
-    function openModal(){ chipModal.style.display = 'flex'; chipModal.setAttribute('aria-hidden','false'); }
-    function closeModal(){ chipModal.style.display = 'none'; chipModal.setAttribute('aria-hidden','true'); hideStatus(); }
-
-    function refreshMainButton(){
-      if(connectedAddress){
-        mainButton.innerHTML = `
-          <div class="connected-chip" id="connected-chip" title="${connectedAddress}">
-            <div class="address">${shorten(connectedAddress)}</div>
-            <div class="balance">${connectedBalance} MATIC</div>
-          </div>
-        `;
-        document.getElementById('connected-chip').addEventListener('click', disconnect);
-      } else {
-        mainButton.innerHTML = `<span class="dot" aria-hidden="true"></span><span id="main-btn-text">Connect Wallet</span>`;
-      }
-    }
-
-    async function ensurePolygonChain(raw){
-      try{
-        const current = await raw.request({ method: 'eth_chainId' });
-        if(current && current.toLowerCase() === POLYGON_CHAIN_ID_HEX) return;
-        await raw.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: POLYGON_CHAIN_ID_HEX }] });
-      }catch(switchError){
-        const code = switchError?.code;
-        if(code === 4902 || (switchError && /Unrecognized chain/i.test(switchError.message || ''))){
-          try{
-            await raw.request({
-              method: 'wallet_addEthereumChain',
-              params: [{
-                chainId: POLYGON_CHAIN_ID_HEX,
-                chainName: 'Polygon Mainnet',
-                nativeCurrency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 },
-                rpcUrls: [POLYGON_RPC],
-                blockExplorerUrls: ['https://polygonscan.com']
-              }]
-            });
-            await raw.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: POLYGON_CHAIN_ID_HEX }] });
-          }catch(addErr){
-            console.warn('Failed to add Polygon chain:', addErr);
-            throw addErr;
-          }
-        } else {
-          throw switchError;
-        }
-      }
-    }
-
-    // Injected connect (MetaMask/Binance)
-    async function connectInjected(){
-      try{
-        if(!window.ethereum){
-          showStatus('No injected wallet detected. Try MetaMask mobile or install an extension.');
-          return;
-        }
-        rawProvider = window.ethereum;
-        await ensurePolygonChain(rawProvider);
-        const accounts = await rawProvider.request({ method: 'eth_requestAccounts' });
-        if(!accounts || accounts.length === 0){ showStatus('No accounts returned.'); return; }
-        connectedAddress = window.ethers.utils.getAddress(accounts[0]);
-        provider = new window.ethers.providers.Web3Provider(rawProvider);
-        signer = provider.getSigner();
-        const bal = await provider.getBalance(connectedAddress);
-        connectedBalance = formatBalance(bal);
-        connectedWalletType = 'injected';
-        setupInjectedListeners(rawProvider);
-        closeModal();
-        refreshMainButton();
-      }catch(err){
-        console.error('Injected connect error:', err);
-        showStatus('Injected connection failed: ' + (err?.message || err?.toString()));
-      }
-    }
-
-    function setupInjectedListeners(raw){
-      if(!raw || !raw.on) return;
-      raw.on('accountsChanged', (accounts) => {
-        if(!accounts || accounts.length === 0){ disconnect(); return; }
-        connectedAddress = window.ethers.utils.getAddress(accounts[0]);
-        provider.getBalance(connectedAddress).then(b => { connectedBalance = formatBalance(b); refreshMainButton(); }).catch(()=>refreshMainButton());
-      });
-      raw.on('chainChanged', (chainId) => {
-        if(chainId !== POLYGON_CHAIN_ID_HEX) showStatus('Please switch your wallet back to Polygon network.');
-        else hideStatus();
-      });
-      raw.on('disconnect', () => { disconnect(); });
-    }
-
-    // Robust loader: try ESM import, then fallback to UMD script injection and global detection.
-    async function loadWalletConnectProviderClass(){
-      const esmUrl = 'https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.6.0/dist/esm/index.min.js';
-      const umdUrl = 'https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.6.0/dist/umd/index.min.js';
-      let ProviderClass = null;
-
-      // 1) Try dynamic ESM import (most reliable if CDN allows module import)
-      try{
-        const m = await import(esmUrl);
-        // ESM likely exports default as EthereumProvider class
-        ProviderClass = m.default || m.EthereumProvider || m.WalletConnectProvider || m;
-        if(ProviderClass) {
-          console.log('Loaded WalletConnect provider via ESM import.');
-          return ProviderClass;
-        }
-      }catch(e){
-        console.warn('ESM import of WalletConnect provider failed (this is OK in some CSP/CDN setups):', e);
-      }
-
-      // 2) Fallback: inject UMD script and wait for globals
-      try{
-        await new Promise((resolve, reject) => {
-          // Check if a global already exists
-          const globalCandidates = [
-            // Known possible global shapes:
-            'WalletConnect', 'WalletConnectEthereumProvider', 'WalletConnectProvider', 'EthereumProvider', 'walletConnect'
-          ];
-          for(const g of globalCandidates){
-            if(window[g]) { resolve(); return; }
-          }
-
-          const s = document.createElement('script');
-          s.src = umdUrl;
-          s.async = true;
-          s.onload = () => resolve();
-          s.onerror = (err) => reject(new Error('Failed to load UMD script: ' + umdUrl));
-          document.head.appendChild(s);
-        });
-
-        // After script load, inspect common global names
-        ProviderClass =
-          window.WalletConnect?.EthereumProvider ||
-          window.WalletConnectEthereumProvider ||
-          window.WalletConnectProvider ||
-          window.EthereumProvider ||
-          window.WalletConnect ||
-          window.walletConnect ||
-          null;
-
-        // Some builds expose default on WalletConnect.default
-        if(!ProviderClass && window.WalletConnect && window.WalletConnect.default) ProviderClass = window.WalletConnect.default;
-        if(!ProviderClass && window.WalletConnectProvider && window.WalletConnectProvider.default) ProviderClass = window.WalletConnectProvider.default;
-
-        if(ProviderClass && typeof ProviderClass.init === 'function'){
-          console.log('Loaded WalletConnect provider via UMD globals.');
-          return ProviderClass;
-        }
-
-        // If ProviderClass is constructor function/class rather than container with init,
-        // some UMD expose a class directly (not an object with init). We'll try to use it directly below.
-        if(ProviderClass && (typeof ProviderClass === 'function' || typeof ProviderClass === 'object')){
-          console.log('Detected WalletConnect provider global object/class, will attempt to use it.');
-          return ProviderClass;
-        }
-
-        // Not found or unexpected structure
-        console.warn('WalletConnect UMD loaded but expected globals not found. Available window keys that match walletconnect:', Object.keys(window).filter(k => /walletconnect|WalletConnect|EthereumProvider|WalletConnectProvider/i.test(k)));
-        return null;
-      }catch(err){
-        console.error('Failed to load WalletConnect provider UMD:', err);
-        return null;
-      }
-    }
-
-    // Connect using WalletConnect v2 through the provider class obtained above.
-    async function connectWalletConnectV2(){
-      hideStatus();
-      showStatus('Preparing WalletConnect v2...');
-
-      const WCProviderClass = await loadWalletConnectProviderClass();
-      if(!WCProviderClass){
-        showStatus('WalletConnect v2 library not found. Ensure the page can access the CDN or bundle the library locally.');
-        return;
-      }
-
-      if(!WALLETCONNECT_PROJECT_ID || WALLETCONNECT_PROJECT_ID === 'YOUR_WALLETCONNECT_PROJECT_ID'){
-        showStatus('Please set WALLETCONNECT_PROJECT_ID in the configuration.');
-        return;
-      }
-
-      try{
-        // Different builds may give either:
-        // - an object with an init(...) factory function, or
-        // - a class/constructor where you call new WCProviderClass({...})
-        // We'll handle both shapes.
-        let instance = null;
-
-        if(typeof WCProviderClass.init === 'function'){
-          // Factory style (common): call init to get provider
-          instance = await WCProviderClass.init({
-            projectId: WALLETCONNECT_PROJECT_ID,
-            chains: [POLYGON_CHAIN_ID_DEC],
-            showQrModal: true,
-            rpcMap: { [POLYGON_CHAIN_ID_DEC]: POLYGON_RPC },
-            metadata: {
-              name: document.title || 'My App',
-              description: 'Connect to Polygon via WalletConnect v2',
-              url: window.location.origin,
-              icons: []
-            }
-          });
-        } else if(typeof WCProviderClass === 'function'){
-          // Class-style constructor (some globals expose a class directly)
-          // Try constructing an instance — library may expect different param names so we try common ones.
-          try{
-            instance = new WCProviderClass({
-              projectId: WALLETCONNECT_PROJECT_ID,
-              chains: [POLYGON_CHAIN_ID_DEC],
-              showQrModal: true,
-              rpcMap: { [POLYGON_CHAIN_ID_DEC]: POLYGON_RPC },
-              metadata: {
-                name: document.title || 'My App',
-                description: 'Connect to Polygon via WalletConnect v2',
-                url: window.location.origin,
-                icons: []
-              }
-            });
-            // Some class builds require calling .init() or .enable()
-            if(typeof instance.init === 'function') await instance.init();
-          }catch(innerErr){
-            console.warn('Constructor path failed, trying init() on provided object if available.', innerErr);
-            if(typeof WCProviderClass.init === 'function'){
-              instance = await WCProviderClass.init({
-                projectId: WALLETCONNECT_PROJECT_ID,
-                chains: [POLYGON_CHAIN_ID_DEC],
-                showQrModal: true,
-                rpcMap: { [POLYGON_CHAIN_ID_DEC]: POLYGON_RPC },
-                metadata: {
-                  name: document.title || 'My App',
-                  description: 'Connect to Polygon via WalletConnect v2',
-                  url: window.location.origin,
-                  icons: []
-                }
-              });
-            } else {
-              throw innerErr;
-            }
-          }
-        } else {
-          showStatus('Unexpected WalletConnect provider shape. Check console for diagnostics.');
-          console.error('Unexpected ProviderClass shape:', WCProviderClass);
-          return;
-        }
-
-        if(!instance){
-          showStatus('Could not initialize WalletConnect provider instance.');
-          return;
-        }
-
-        rawProvider = instance;
-
-        // Request accounts (this will open QR modal on desktop / deep link on mobile)
-        await rawProvider.request({ method: 'eth_requestAccounts' });
-
-        provider = new window.ethers.providers.Web3Provider(rawProvider);
-        signer = provider.getSigner();
-        const accounts = await provider.listAccounts();
-        if(!accounts || accounts.length === 0){
-          showStatus('No accounts returned from WalletConnect.');
-          return;
-        }
-        connectedAddress = window.ethers.utils.getAddress(accounts[0]);
-        const bal = await provider.getBalance(connectedAddress);
-        connectedBalance = formatBalance(bal);
-        connectedWalletType = 'walletconnect_v2';
-
-        // Wire events
-        if(rawProvider.on){
-          rawProvider.on('disconnect', () => disconnect());
-          rawProvider.on('accountsChanged', (accounts) => {
-            if(!accounts || accounts.length === 0){ disconnect(); return; }
-            connectedAddress = window.ethers.utils.getAddress(accounts[0]);
-            provider.getBalance(connectedAddress).then(b => { connectedBalance = formatBalance(b); refreshMainButton(); }).catch(()=>refreshMainButton());
-          });
-          rawProvider.on('chainChanged', (chainId) => {
-            if(chainId !== POLYGON_CHAIN_ID_HEX) showStatus('Please switch your wallet back to Polygon network.');
-            else hideStatus();
-          });
-        }
-
-        closeModal();
-        refreshMainButton();
-      }catch(err){
-        console.error('WalletConnect v2 connect error:', err);
-        showStatus('WalletConnect connection failed: ' + (err?.message || err?.toString()));
-      }
-    }
-
-    async function disconnect(){
-      try{
-        if(rawProvider && typeof rawProvider.disconnect === 'function'){
-          try{ await rawProvider.disconnect(); }catch(e){ /* ignore */ }
-        }
-      }catch(e){}
-      provider = null;
-      rawProvider = null;
-      signer = null;
-      connectedAddress = null;
-      connectedBalance = null;
-      connectedWalletType = null;
-      refreshMainButton();
-      hideStatus();
-    }
-
-    // Event wiring
-    mainButton.addEventListener('click', () => {
-      if(connectedAddress){ disconnect(); return; }
-      openModal();
-    });
-    closeModalBtn.addEventListener('click', closeModal);
-    chipModal.addEventListener('click', (e) => { if(e.target === chipModal) closeModal(); });
-    injectedChip.addEventListener('click', async () => { showStatus('Connecting injected wallet...'); await connectInjected(); });
-    walletconnectChip.addEventListener('click', async () => { await connectWalletConnectV2(); });
-
-    document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeModal(); });
-
-    // Initial UI
-    refreshMainButton();
-
-    // Diagnostics to help you debug quickly (prints available globals matching walletconnect)
-    (function diagnostics(){
-      const keys = Object.keys(window).filter(k => /walletconnect|WalletConnect|EthereumProvider|WalletConnectProvider|walletConnect/i.test(k));
-      console.log('Diagnostics: walletconnect-like globals on window:', keys);
-      diagFooter.textContent = 'Diagnostics: found globals: ' + (keys.length ? keys.join(', ') : '(none)');
-    })();
-  </script>
+  <script type="module" src="/src/main.js"></script>
 </body>
 </html>
